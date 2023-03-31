@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: shproject
+      POSTGRES_USER: shproject
+      POSTGRES_PASSWORD: shproject
+    ports:
+      - "5432:5432"
