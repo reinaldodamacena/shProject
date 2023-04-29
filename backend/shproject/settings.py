@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'backShProject',
     'rest_framework',
-    
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [

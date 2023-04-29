@@ -1,12 +1,17 @@
 from django.contrib import admin
-from django.apps import apps
-from django.contrib.auth.models import Group
+from .models import Profile, Community, Post, Feed, Message, Comment
 
-# unregister the Group model
-admin.site.unregister(Group)
+class CommentInline(admin.TabularInline):
+    model = Comment
+    extra = 0
 
-models = apps.get_models()
+class PostAdmin(admin.ModelAdmin):
+    inlines = [
+        CommentInline,
+    ]
 
-for model in models:
-    if model._meta.model_name != 'user':
-        admin.site.register(model)
+admin.site.register(Profile)
+admin.site.register(Community)
+admin.site.register(Post, PostAdmin)
+admin.site.register(Feed)
+admin.site.register(Message)

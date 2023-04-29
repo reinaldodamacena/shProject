@@ -13,12 +13,32 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.urls import path, include
 from django.contrib import admin
-from django.urls import path
-from backShProject import views
+from django.conf.urls.static import static
+from django.conf import settings
+from backShProject.views import (profile, community, post, create_post, feed, chat, search, home, ProfileList, ProfileDetail, CommunityList, CommunityDetail, PostList, PostDetail, MessageList, MessageDetail, FeedUser, CustomAuthToken)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/messages/', views.MessageList.as_view(), name='message-list'),
-    path('api/messages/<int:pk>/', views.MessageDetail.as_view(), name='message-detail'),
+    path('',home),
+    path('profile/', profile, name='profile'),
+    path('community/<int:community_id>/', community, name='community'),
+    path('post/<int:post_id>/', post, name='post'),
+    path('create_post/', create_post, name='create_post'),
+    path('feed/', feed, name='feed'),
+    path('chat/<str:username>/', chat, name='chat'),
+    path('search/', search, name='search'),
+    path('profiles/', ProfileList.as_view()),
+    path('profiles/<int:pk>/', ProfileDetail.as_view()),
+    path('communities/', CommunityList.as_view()),
+    path('communities/<int:pk>/', CommunityDetail.as_view()),
+    path('posts/', PostList.as_view()),
+    path('posts/<int:pk>/', PostDetail.as_view()),
+    path('messages/', MessageList.as_view()),
+    path('messages/<int:pk>/', MessageDetail.as_view()),
+    path('FeedUser/', FeedUser.as_view(), name='feed-user-list'),
+    path('api-token-auth/', CustomAuthToken.as_view()),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

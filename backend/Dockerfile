@@ -1,6 +1,10 @@
-FROM python:3.9-slim-buster
+FROM python:3.9-alpine
 
 WORKDIR /app
+
+RUN apk update && \
+    apk add --virtual build-deps gcc python3-dev musl-dev && \
+    apk add postgresql-dev
 
 COPY requirements.txt .
 
