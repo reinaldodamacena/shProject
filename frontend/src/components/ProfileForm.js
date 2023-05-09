@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from '../api';
 import {
   Box,
   Button,
@@ -26,7 +26,7 @@ function ProfileForm() {
   const handleSubmit = (event) => {
     event.preventDefault();
     setLoading(true);
-    axios.post("/api/profiles/", formData)
+    api.post("/api/profiles/", formData)
       .then((response) => {
         setLoading(false);
         console.log(response.data);
