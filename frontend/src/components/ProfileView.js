@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import ProfileForm from './ProfileForm';
 
 function ProfileView() {
@@ -8,7 +8,7 @@ function ProfileView() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get('/api/profile/')
+    api.get('/api/profile/')
       .then(response => {
         setProfileData(response.data);
         setLoading(false);
@@ -21,7 +21,7 @@ function ProfileView() {
 
   const handleSubmit = (formData) => {
     setLoading(true);
-    axios.put('/api/profiles/', formData)
+    api.put('/api/profiles/', formData)
       .then(response => {
         setProfileData(response.data);
         setLoading(false);
