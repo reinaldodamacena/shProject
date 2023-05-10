@@ -17,20 +17,19 @@ from django.urls import path, include
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
-from backShProject.views import (profile, community, post, create_post, feed, chat, search, home, ProfileList, ProfileDetail, CommunityList, CommunityDetail, PostList, PostDetail, MessageList, MessageDetail, FeedUser, CustomAuthToken)
+from backShProject.views import (profile, community, post, create_post, feed, chat, search, home, ProfileList, ProfileDetail, CommunityList, CommunityDetail, PostList, PostDetail, MessageList, MessageDetail, FeedUser, CustomAuthToken, LikePost)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',home),
-    path('profile/', profile, name='profile'),
     path('community/<int:community_id>/', community, name='community'),
     path('post/<int:post_id>/', post, name='post'),
     path('create_post/', create_post, name='create_post'),
     path('feed/', feed, name='feed'),
     path('chat/<str:username>/', chat, name='chat'),
     path('search/', search, name='search'),
-    path('api/profiles/', ProfileList.as_view(), name='profile-api'),
-    path('api/profiles/<int:pk>/', ProfileDetail.as_view(), name='profileDatail-api'),
+    path('profiles/', ProfileList.as_view()),
+    path('profile/', ProfileDetail.as_view(), name='profile-detail'),
     path('communities/', CommunityList.as_view()),
     path('communities/<int:pk>/', CommunityDetail.as_view()),
     path('posts/', PostList.as_view()),
@@ -39,6 +38,9 @@ urlpatterns = [
     path('messages/<int:pk>/', MessageDetail.as_view()),
     path('FeedUser/', FeedUser.as_view(), name='feed-user-list'),
     path('api-token-auth/', CustomAuthToken.as_view()),
+    path('__debug__/', include('debug_toolbar.urls', namespace='djdt')),
+    path('posts/<int:post_id>/like/', LikePost.as_view(), name='like_post'),
+    path('posts/<int:post_id>/check_like/', LikePost.as_view(), name='post-check-like'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

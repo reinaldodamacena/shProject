@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import api from '../api';
-import ProfileForm from './ProfileForm';
+import api from '../Api';
+import ProfileForm from '/ProfileForm';
 
 function ProfileView() {
   const [profileData, setProfileData] = useState(null);

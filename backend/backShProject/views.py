@@ -1,14 +1,17 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from .forms import PostForm
-from .models import Profile, Community, Post, Feed, Message, Profile
-from rest_framework import generics, permissions
+from .models import Profile, Community, Post, Feed, Message, Profile, Like
+from rest_framework import generics, permissions, status
 from .serializers import ProfileSerializer, CommunitySerializer, PostSerializer, MessageSerializer
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
 
 
 def home(request):
@@ -77,30 +80,51 @@ def search(request):
     return render(request, 'search.html', {'communities': communities})
 #---------- MÉTODOS ACIMA UTILIZADOS NA MODELAGEM QUANDO AINDA NÃO HÁ FRONT, APENAS PARA TESTES, DEVERÃO SER DESCONSIDERADOS EM BREVE
 
+
 class ProfileList(generics.ListCreateAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+    permission_classes = [AllowAny]
 
-
-class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
+class ProfileDetail(generics.RetrieveAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
 
+    def retrieve(self, request, *args, **kwargs):
+        authenticated_profile = self.get_authenticated_profile()
+        if authenticated_profile :
+            serializer = self.get_serializer(authenticated_profile)
+            return Response(serializer.data)
+        else:
+            return Response({'error': 'Token inválido'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    def get_authenticated_profile(self):
+        token = self.request.META.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
+        try:
+            profile = Profile.objects.get(user__auth_token__key=token)
+            return profile
+        except Profile.DoesNotExist:
+            return None
 
 class CommunityList(generics.ListCreateAPIView):
     queryset = Community.objects.all()
     serializer_class = CommunitySerializer
 
-
 class CommunityDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Community.objects.all()
     serializer_class = CommunitySerializer
 
-
 class PostList(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
@@ -110,14 +134,13 @@ class MessageList(generics.ListCreateAPIView):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
 
-
 class MessageDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
 
 class FeedUser(generics.ListCreateAPIView):
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
@@ -133,12 +156,48 @@ class FeedUser(generics.ListCreateAPIView):
         post_ids = list(set(post_ids))
 
         queryset = Post.objects.filter(id__in=post_ids).order_by('-timestamp')
-        return queryset
+        return queryset.select_related('author__profile')
 
 class CustomAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
+        user = request.user
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key})
+
+class LikePost(generics.ListCreateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        post_id = kwargs['post_id']
+        try:
+            post = Post.objects.get(id=post_id)
+            user = request.user
+
+            if user in post.likes.all():
+                post.likes.remove(user)
+                liked = False
+            else:
+                post.likes.add(user)
+                liked = True
+
+            return self.list(request, *args, **kwargs)
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post not found'}, status=404)
+    
+    def get(self, request, *args, **kwargs):
+        post_id = kwargs['post_id']
+        try:
+            post = Post.objects.get(id=post_id)
+            user = request.user
+
+            if user in post.likes.all():
+                return JsonResponse({'liked': True})
+            else:
+                return JsonResponse({'liked': False})
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post not found'}, status=404)

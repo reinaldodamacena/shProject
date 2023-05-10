@@ -1,15 +1,16 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import ProfileForm from './components/ProfileForm';
-import ProfileView from './components/ProfileView';
-import './App.css';
+import Home from './components/Home';
+import LoginPage from './components/LoginPage';
+
+
 
 function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/" element={<ProfileForm />} />
-        <Route path="/:id" element={<ProfileView />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<LoginPage />} />
       </Routes>
     </div>
   );
