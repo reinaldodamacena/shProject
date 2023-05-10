@@ -1,0 +1,23 @@
+.bg-profile{
+    max-width: 500px;
+}
+.img-profile{
+    max-width: 200px;
+}
+.main-content{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+.left-sidebar{
+    position: fixed;
+    justify-self: start;
+}
+.right-sidebar{
+    position: fixed;
+    justify-self: end;
+}
+.center-content{
+    position: absolute;
+    justify-self: center;
+    max-width: 30%;
+}

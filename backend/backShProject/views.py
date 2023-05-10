@@ -1,14 +1,18 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from .forms import PostForm
-from .models import Profile, Community, Post, Feed, Message, Profile
-from rest_framework import generics, permissions
+from .models import Profile, Community, Post, Feed, Message, Profile, Like
+from rest_framework import generics, permissions, status
 from .serializers import ProfileSerializer, CommunitySerializer, PostSerializer, MessageSerializer
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly, BasePermission
+
+
 
 
 def home(request):
@@ -77,53 +81,90 @@ def search(request):
     return render(request, 'search.html', {'communities': communities})
 #---------- MÉTODOS ACIMA UTILIZADOS NA MODELAGEM QUANDO AINDA NÃO HÁ FRONT, APENAS PARA TESTES, DEVERÃO SER DESCONSIDERADOS EM BREVE
 
+
 class ProfileList(generics.ListCreateAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+    permission_classes = [AllowAny]
 
+class ConnectedProfileList(generics.ListCreateAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
 
-class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
+    def get_queryset(self):
+        user = self.request.user
+        return user.profile.connections.all()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        serializer.save(user=user)
+
+class ProfileDetail(generics.RetrieveUpdateAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user.profile
 
 
 class CommunityList(generics.ListCreateAPIView):
     queryset = Community.objects.all()
     serializer_class = CommunitySerializer
 
+class IsMember(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user in obj.members.all()
 
-class CommunityDetail(generics.RetrieveUpdateDestroyAPIView):
+class CommunityDetail(generics.RetrieveUpdateAPIView):
     queryset = Community.objects.all()
     serializer_class = CommunitySerializer
-
+    permission_classes = [IsAuthenticatedOrReadOnly, IsMember]
 
 class PostList(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
-class PostDetail(generics.RetrieveUpdateDestroyAPIView):
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+class IsPostCreator(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user == obj.creator
+
+class PostDetail(generics.RetrieveUpdateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, IsPostCreator]
 
 class MessageList(generics.ListCreateAPIView):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
 
+class IsParticipant(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user in obj.participants.all()
 
-class MessageDetail(generics.RetrieveUpdateDestroyAPIView):
+class MessageDetail(generics.RetrieveAPIView):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated, IsParticipant]
 
 class FeedUser(generics.ListCreateAPIView):
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
         profile = get_object_or_404(Profile, user=user)
         connections = profile.connections.all()
-        posts = Post.objects.filter(author__profile__in=connections).order_by('-timestamp')
+        profiles_to_include = list(connections)  # Converta as conexões para uma lista
+        profiles_to_include.append(profile)
+        posts = Post.objects.filter(author__profile__in=profiles_to_include).order_by('-timestamp')
         ordered_posts = Post.objects.exclude(pk__in=posts).exclude(author=user).order_by('-likes')
 
         post_ids = list(posts.values_list('id', flat=True))
@@ -133,12 +174,33 @@ class FeedUser(generics.ListCreateAPIView):
         post_ids = list(set(post_ids))
 
         queryset = Post.objects.filter(id__in=post_ids).order_by('-timestamp')
-        return queryset
+        return queryset.select_related('author__profile')
 
 class CustomAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
+        user = request.user
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key})
+
+class LikePost(generics.RetrieveAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def retrieve(self, request, *args, **kwargs):
+        post = self.get_object()
+        user = request.user
+
+        if user.is_authenticated:
+            liked = post.likes.filter(id=user.id).exists()
+            return Response({'liked': liked})
+        else:
+            return Response({'detail': 'Authentication credentials were not provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    def get_object(self):
+        post_id = self.kwargs.get('post_id')
+        post = get_object_or_404(Post, id=post_id)
+        return post
