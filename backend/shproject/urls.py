@@ -17,6 +17,7 @@ from django.urls import path, include
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
+from rest_framework.authtoken.views import obtain_auth_token
 from backShProject.views import (profile, community, post, create_post, feed, chat, search, home, ProfileList, ProfileDetail, CommunityList, CommunityDetail, PostList, PostDetail, MessageList, MessageDetail, FeedUser, CustomAuthToken, LikePost)
 
 urlpatterns = [
@@ -41,6 +42,7 @@ urlpatterns = [
     path('__debug__/', include('debug_toolbar.urls', namespace='djdt')),
     path('posts/<int:post_id>/like/', LikePost.as_view(), name='like_post'),
     path('posts/<int:post_id>/check_like/', LikePost.as_view(), name='post-check-like'),
+    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

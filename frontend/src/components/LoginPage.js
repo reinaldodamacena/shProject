@@ -44,30 +44,19 @@ const LoginPage = () => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="username">Usuário:</label>
-          <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={handleUsernameChange}
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Senha:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={handlePasswordChange}
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <label>
+        Username:
+        <input type="text" value={username} onChange={handleUsernameChange} />
+      </label>
+      <br />
+      <label>
+        Password:
+        <input type="password" value={password} onChange={handlePasswordChange} />
+      </label>
+      <br />
+      <button type="submit">Login</button>
+    </form>
   );
 };
 

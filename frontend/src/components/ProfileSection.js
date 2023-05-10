@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { getFeedData } from '../Api'; // importando a função que busca os dados do perfil
+import { getProfileData } from '../Api';
 
 const ProfileSection = () => {
-  const [profileData, setProfileData] = useState(null);
+  const [profileData, setProfileData] = useState({});
 
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
         const authToken = localStorage.getItem('authToken');
-        const data = await getFeedData(authToken); // usando a função para buscar os dados do perfil
+        console.log('authToken:', authToken);
+        const data = await getProfileData(authToken);
+        console.log('profileData:', data);
         setProfileData(data);
       } catch (error) {
         console.log(error);
@@ -31,9 +33,9 @@ const ProfileSection = () => {
       {/* Imagem de perfil */}
       <img src={avatar} alt="Imagem de perfil" className="img-profile" />
       {/* Nome de usuário */}
-      <div>Nome de usuário: {user.username}</div>
+      <div>Nome de usuário: {user?.username}</div> 
       {/* Número de conexões */}
-      <div>Número de conexões: {connections.length}</div>
+      <div>Número de conexões: {connections ? connections.length: 0}</div>
       {/* Opção para ir até as publicações */}
       <button>Ir até as publicações</button>
       {/* Opção para ir até os vídeos */}

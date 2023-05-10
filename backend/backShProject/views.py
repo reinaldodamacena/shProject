@@ -10,7 +10,8 @@ from .forms import PostForm
 from .models import Profile, Community, Post, Feed, Message, Profile, Like
 from rest_framework import generics, permissions, status
 from .serializers import ProfileSerializer, CommunitySerializer, PostSerializer, MessageSerializer
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly, BasePermission
+
 
 
 
@@ -86,34 +87,27 @@ class ProfileList(generics.ListCreateAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [AllowAny]
 
-class ProfileDetail(generics.RetrieveAPIView):
+class ProfileDetail(generics.RetrieveUpdateAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
 
-    def retrieve(self, request, *args, **kwargs):
-        authenticated_profile = self.get_authenticated_profile()
-        if authenticated_profile :
-            serializer = self.get_serializer(authenticated_profile)
-            return Response(serializer.data)
-        else:
-            return Response({'error': 'Token inválido'}, status=status.HTTP_401_UNAUTHORIZED)
+    def get_object(self):
+        return self.request.user.profile
 
-    def get_authenticated_profile(self):
-        token = self.request.META.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
-        try:
-            profile = Profile.objects.get(user__auth_token__key=token)
-            return profile
-        except Profile.DoesNotExist:
-            return None
 
 class CommunityList(generics.ListCreateAPIView):
     queryset = Community.objects.all()
     serializer_class = CommunitySerializer
 
-class CommunityDetail(generics.RetrieveUpdateDestroyAPIView):
+class IsMember(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user in obj.members.all()
+
+class CommunityDetail(generics.RetrieveUpdateAPIView):
     queryset = Community.objects.all()
     serializer_class = CommunitySerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, IsMember]
 
 class PostList(generics.ListCreateAPIView):
     queryset = Post.objects.all()
@@ -126,17 +120,27 @@ class PostList(generics.ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
-class PostDetail(generics.RetrieveUpdateDestroyAPIView):
+class IsPostCreator(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user == obj.creator
+
+class PostDetail(generics.RetrieveUpdateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, IsPostCreator]
 
 class MessageList(generics.ListCreateAPIView):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
 
-class MessageDetail(generics.RetrieveUpdateDestroyAPIView):
+class IsParticipant(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user in obj.participants.all()
+
+class MessageDetail(generics.RetrieveAPIView):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated, IsParticipant]
 
 class FeedUser(generics.ListCreateAPIView):
     serializer_class = PostSerializer
@@ -167,37 +171,22 @@ class CustomAuthToken(ObtainAuthToken):
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key})
 
-class LikePost(generics.ListCreateAPIView):
+class LikePost(generics.RetrieveAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
-        post_id = kwargs['post_id']
-        try:
-            post = Post.objects.get(id=post_id)
-            user = request.user
+    def retrieve(self, request, *args, **kwargs):
+        post = self.get_object()
+        user = request.user
 
-            if user in post.likes.all():
-                post.likes.remove(user)
-                liked = False
-            else:
-                post.likes.add(user)
-                liked = True
+        if user.is_authenticated:
+            liked = post.likes.filter(id=user.id).exists()
+            return Response({'liked': liked})
+        else:
+            return Response({'detail': 'Authentication credentials were not provided.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-            return self.list(request, *args, **kwargs)
-        except Post.DoesNotExist:
-            return JsonResponse({'error': 'Post not found'}, status=404)
-    
-    def get(self, request, *args, **kwargs):
-        post_id = kwargs['post_id']
-        try:
-            post = Post.objects.get(id=post_id)
-            user = request.user
-
-            if user in post.likes.all():
-                return JsonResponse({'liked': True})
-            else:
-                return JsonResponse({'liked': False})
-        except Post.DoesNotExist:
-            return JsonResponse({'error': 'Post not found'}, status=404)
+    def get_object(self):
+        post_id = self.kwargs.get('post_id')
+        post = get_object_or_404(Post, id=post_id)
+        return post

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { LOGIN_ROUTE, POSTS_ROUTE, FEED_USER_ROUTE } from './apiRoutes';
+import { LOGIN_ROUTE, POSTS_ROUTE, FEED_USER_ROUTE, PROFILE_ROUTE } from './apiRoutes';
 
 const api = axios.create({
   baseURL: 'http://127.0.0.1:8000', // Altere a URL base da sua API conforme necessário
@@ -11,11 +11,17 @@ const api = axios.create({
 export const login = async (username, password) => {
   try {
     const response = await api.post(LOGIN_ROUTE, { username, password });
-    return response.data;
+    if (response.status === 200 && response.data && response.data.token) {
+      localStorage.setItem('authToken', response.data.token);
+      return response.data;
+    } else {
+      throw new Error('Erro de autenticação');
+    }
   } catch (error) {
-    throw new Error('Erro de autenticação');
+    throw new Error('Erro de autenticação: ' + error.message);
   }
 };
+
 
 export const createPost = async (formData) => {
   try {
@@ -63,5 +69,18 @@ export const getFeedData = async () => {
     }
   } catch (error) {
     throw new Error('Erro ao obter o feed do usuário: ' + error.message);
+  }
+};
+
+export const getProfileData = async (authToken) => {
+  try {
+    const response = await api.get(PROFILE_ROUTE, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('Erro ao obter as informações do perfil: ' + error.message);
   }
 };
