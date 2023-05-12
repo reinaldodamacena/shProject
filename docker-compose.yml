@@ -1,25 +1,30 @@
-version: "3"
-
+version: '3.4'
 services:
   backend:
     build: ./backend
-    ports:
-      - "8000:8000"
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend:/app
+    ports:
+      - "8000:8000"
     environment:
       - DATABASE_URL=sqlite:////app/db.sqlite3
+    mem_limit: 512m
+    
 
   frontend:
     build: ./frontend
-    ports:
-      - "3000:3000"
+    command: npm start
     volumes:
       - ./frontend:/app
       - ./frontend/node_modules:/app/node_modules
       - ./:/app
+    ports:
+      - "3000:3000"
     environment:
       - REACT_APP_API_BASE_URL=http://backend:8000
+    mem_limit: 512m
+    
 
 volumes:
   dbdata:

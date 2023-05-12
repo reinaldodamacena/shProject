@@ -8,7 +8,7 @@ const ProfileSection = () => {
     const fetchProfileData = async () => {
       try {
         const authToken = localStorage.getItem('authToken');
-        console.log('authToken:', authToken);
+        
         const data = await getProfileData(authToken);
         console.log('profileData:', data);
         setProfileData(data);

@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Set environment variables for Django settings
-ENV DJANGO_SETTINGS_MODULE=myproject.settings
+ENV DJANGO_SETTINGS_MODULE=shproject.settings
 ENV DATABASE_URL=sqlite:///db.sqlite3
 
 # Run the Django development server
