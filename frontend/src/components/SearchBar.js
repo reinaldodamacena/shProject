@@ -1,10 +1,12 @@
 import React from 'react';
+import TextField from '@mui/material/TextField';
+import './SearchBar.css'
 
 const SearchBar = () => {
   return (
     <div className="search-bar">
       {/* Barra de busca */}
-      <input type="text" placeholder="Procurar por conexões" />
+      <TextField type="text" placeholder="Procurar por conexões" />
     </div>
   );
 };
