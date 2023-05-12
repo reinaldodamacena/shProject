@@ -1,7 +1,6 @@
 // No componente Home
 import React, { useEffect, useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import Header from './Header';
 import ProfileSection from './ProfileSection.js';
 import NavigationButtons from './NavigationButtons.js';
 import CreatePostSection from './CreatePostSection';
@@ -10,6 +9,7 @@ import SearchBar from './SearchBar';
 import FriendList from './FriendList';
 import Chat from './Chat';
 import { useNavigate } from 'react-router-dom';
+import InsertionLogoIcon from '../icons/ch-logo.png';
 import './Home.css';
 
 function Home() {
@@ -30,9 +30,14 @@ function Home() {
 
   return (
     <div className="app-container">
-      <Header />
       <div className="main-content">
         <div className="left-sidebar">
+          <div className='global-logo'>
+            <img src={InsertionLogoIcon} alt="Connect Heroes"/>
+            <div className='logo-name'>
+              <h1>Connect Heroes</h1>
+            </div>
+          </div>
           <ProfileSection />
           <NavigationButtons />
         </div>

@@ -1,0 +1,39 @@
+.post{
+    border: 3px solid #5C95E2;
+    border-radius: 30px;
+    padding: 20px;
+    width: 100%;
+    margin-top: 30px;
+}
+.head-post{
+    display: flex;
+}
+.head-post > *:not(.head-post){
+    margin-left: 10px;
+}
+.post-info > *:not(.post-info){
+    margin: 0%;
+}
+.post-data{
+    color: #787878;
+}
+.post-content{
+    margin-left: 50px;
+    margin-right: 50px;
+}
+.post-img{
+    width: 100%;
+    border-radius: 15px;
+    justify-self: center;
+}
+.b-opitions{
+    margin-top: 15px;
+    display: flex;
+    justify-content: end;
+}
+.b-opitions > *:not(.b-opitions){
+    margin-left: 10px;
+}
+.b-like, .b-comment, .b-send{
+    cursor:pointer;
+}

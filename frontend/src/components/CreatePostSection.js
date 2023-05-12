@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 import { createPost } from '../Api';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import InsertionMediaIcon from '../icons/media.svg';
+import InsertionLocalizationIcon from '../icons/localization.svg';
+import './CreatePostSection.css'
 
 const CreatePostSection = ({ onPostCreated }) => {
   const [content, setContent] = useState('');
@@ -26,19 +31,36 @@ const CreatePostSection = ({ onPostCreated }) => {
     }
   };
 
+  const handleIconClick = () => {
+    document.getElementById('file-input').click();
+  };
+
   return (
     <section className="create-post-section">
       <form onSubmit={handleFormSubmit}>
         {/* Caixa de texto */}
-        <textarea
+        <TextField
+          multiline
+          rows={4}
+          variant="outlined"
           placeholder="Digite sua publicação"
+          fullWidth
+          InputProps={{
+            readOnly: false,
+          }}
           value={content}
           onChange={(e) => setContent(e.target.value)}
-        ></textarea>
+        />
         {/* Opção para inserir mídia */}
-        <input type="file" onChange={(e) => setImage(e.target.files[0])} />
-        {/* Botão de publicar */}
-        <button type="submit">Publicar</button>
+        <div className="options">
+          <div className="file-input-container">
+            <img src={InsertionMediaIcon} alt="Inserção de Mídia" className="insertion-icon" onClick={handleIconClick} />
+            <input type="file" id="file-input" className="file-input" onChange={(e) => setImage(e.target.files[0])} />
+          </div>
+          <img src={InsertionLocalizationIcon} alt="Inserção de Mídia" className="insertion-icon" onClick={console.log('foi')}/>
+          {/* Botão de publicar */}
+          <Button variant="contained" type="submit" sx={{ backgroundColor: '#5C95E3' }}>Publicar</Button>
+        </div>
       </form>
     </section>
   );

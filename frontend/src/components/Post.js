@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Avatar from '@mui/material/Avatar';
+import InsertionLikeIcon from '../icons/like.svg';
+import InsertionUnlikeIcon from '../icons/unlike.svg';
+import InsertionCommentIcon from '../icons/comment.svg';
+import InsertionSendIcon from '../icons/send.svg';
+import './Post.css'
 
-const Post = ({ user, content, image, timestamp, likes, postId }) => {
+
+const Post = ({ user, profile, content, image, timestamp, likes, postId }) => {
   const [postLikes, setPostLikes] = useState([]);
   const [liked, setLiked] = useState(false);
   useEffect(() => {
-    const fetchPostLikes = async () => {
+    const fetchPostLikes = async () => {  
       try {
         const authToken = localStorage.getItem('authToken');
         const endpoint = `http://localhost:8000/posts/${postId}/check_like/`;
@@ -57,26 +64,26 @@ const Post = ({ user, content, image, timestamp, likes, postId }) => {
 
   return (
     <div className="post">
-      {/* Foto do usuário */}
-      <img src={user.avatar} alt="Avatar" />
+      <div className="head-post">
+        {console.log(profile.user)}
+        <Avatar alt={profile.user.username} src={profile.avatar} sx={{ width: 56, height: 56 }}/>
+        <div className="post-info">
+        <h3 className="post-author">{profile.user.username}</h3>
+        <p className="post-data">{new Date(timestamp).toLocaleDateString('pt-BR', {
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric'
+        })}</p></div>
+      </div>
+      <p className="post-content">{content}</p>
 
-      {/* Nome do usuário */}
-      <div>{user.username}</div>
-
-      {/* Data da publicação */}
-      <div>{timestamp}</div>
-
-      {/* Espaço para caixa de texto */}
-      <p>{content}</p>
-
-      {/* Imagem (se o usuário tiver criado uma) */}
-      {image && <img src={image} alt="Post Image" />}
+      {image && <img className="post-img" src={image} alt="Post Image" />}
 
       {/* Opções "curtir", "comentar" e "compartilhar" */}
-      <div>
-        <button onClick={handleLike}>{liked ? 'Descurtir' : 'Curtir'} {}</button>
-        <button>Comentar</button>
-        <button>Compartilhar</button>
+      <div className="b-opitions">
+        <div className="b-like" onClick={handleLike}>{liked ? <img src={InsertionLikeIcon} alt="Descurtir"/> : <img src={InsertionUnlikeIcon} alt="Curtir"/>} {}</div>
+        <div className="b-comment"><img src={InsertionCommentIcon} alt="Comentar"/></div>
+        <div className="b-send"><img src={InsertionSendIcon} alt="Compartilhar"/></div>
       </div>
     </div>
   );
