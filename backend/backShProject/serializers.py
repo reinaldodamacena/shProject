@@ -7,12 +7,17 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'first_name', 'last_name')
 
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'first_name', 'last_name')
+
 class ProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = CustomUserSerializer(read_only=True)
 
     class Meta:
         model = Profile
-        fields = ('user', 'bio', 'avatar', 'connections')
+        fields = ['user', 'bio', 'avatar', 'connections', 'background_image']
 
 class CommunitySerializer(serializers.ModelSerializer):
     members = UserSerializer(many=True, read_only=True)
@@ -36,21 +41,22 @@ class CommentLikeSerializer(serializers.ModelSerializer):
         fields = ('id','user')
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    author = UserSerializer(read_only=True)
     likes = CommentLikeSerializer(many=True, read_only=True)
 
     class Meta:
         model = Comment
-        fields = ('id', 'user', 'content', 'timestamp', 'likes')
+        fields = ('id', 'author', 'content', 'timestamp', 'likes')
 
 class PostSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
+    profile = ProfileSerializer(source='author.profile', read_only=True)  # Modificação feita aqui
     likes = LikeSerializer(many=True, read_only=True)
-    comments = CommentSerializer(many=True, read_only=True)
+    comments = CommentSerializer(allow_empty=True, many=True, read_only=True)
 
     class Meta:
         model = Post
-        fields = ('id', 'user', 'content', 'image', 'timestamp', 'likes', 'comments')
+        fields = ('id', 'user', 'profile', 'content', 'image', 'timestamp', 'likes', 'comments')
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -59,4 +65,4 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ('id', 'sender', 'receiver', 'content', 'created_at')
+        fields = ('id','sender','receiver', 'content', 'created_at')

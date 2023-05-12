@@ -1,0 +1,32 @@
+.bg-profile{
+    max-width: 500px;
+}
+.img-profile{
+    max-width: 200px;
+}
+.main-content{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+.left-sidebar{
+    position: fixed;
+    justify-self: start;
+    margin: 20px;
+}
+.right-sidebar{
+    position: fixed;
+    justify-self: end;
+    margin: 20px;
+}
+.center-content{
+    position: absolute;
+    justify-self: center;
+    width: 40%;
+}
+.global-logo > img{
+    width: 80px;
+}
+.global-logo{
+    color: #5C95E3;
+    display: flex;
+}
