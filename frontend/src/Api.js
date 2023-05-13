@@ -100,9 +100,15 @@ export const getConnectedProfiles = async () => {
   }
 };
 
-export function connectToChat(roomName, onMessageReceived) {
+export function connectToChat(roomName, senderId, receiverId, onMessageReceived) {
   const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const wsURL = `${wsScheme}//${window.location.host}${CHAT_ROUTE}${roomName}/`;
+  const formattedRoomName = roomName.replace(/\W/g, '');
+  const wsURL = `${wsScheme}//${window.location.host}${CHAT_ROUTE}${formattedRoomName}/`;
+
+  if (senderId && receiverId) {
+    wsURL += `${senderId}/${receiverId}/`;
+  }
+
   const socket = new WebSocket(wsURL);
 
   socket.onmessage = (event) => {

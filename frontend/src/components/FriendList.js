@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getConnectedProfiles, connectToChat } from '../Api';
+import { CHAT_ROUTE } from '../apiRoutes';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import IconButton from '@mui/material/IconButton';
@@ -9,8 +10,6 @@ import Avatar from '@mui/material/Avatar';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { styled } from '@mui/material/styles';
 import Badge from '@mui/material/Badge';
-
-
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -44,6 +43,8 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 const FriendList = () => {
   const [connections, setConnections] = useState([]);
   const [roomName, setRoomName] = useState('');
+  const [senderId, setSenderId] = useState(null);
+  const [receiverId, setReceiverId] = useState(null);
 
   useEffect(() => {
     const fetchConnections = async () => {
@@ -58,10 +59,19 @@ const FriendList = () => {
     fetchConnections();
   }, []);
 
-  const handleConnectToChat = (name) => {
-    setRoomName(name);
-    connectToChat(name, onMessageReceived);
+  const handleConnectToChat = (name, senderId, receiverId) => {
+    if (name && senderId && receiverId) {
+      setRoomName(name);
+      setSenderId(senderId);
+      setReceiverId(receiverId);
+      const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const formattedRoomName = name.replace(/\W/g, '');
+      const wsURL = `${wsScheme}//${window.location.host}${CHAT_ROUTE}${formattedRoomName}/`; // Use a URL correta para acessar a rota do chat websocket
+      connectToChat(wsURL, senderId, receiverId, onMessageReceived); // Passe a URL correta como primeiro parâmetro
+      console.log('name:', name);
+    }
   };
+  
 
   const onMessageReceived = (message) => {
     // Tratar a mensagem recebida
@@ -69,29 +79,29 @@ const FriendList = () => {
 
   return (
     <div className="friend-list">
-<List>{connections.map(connection =>(
-  <ListItem key={connection.id} secondaryAction={
-    <IconButton edge="end" aria-label="message" onClick={() => handleConnectToChat(connection.user.username)}>
-      <ChatBubbleOutlineIcon />
-    </IconButton>
-  }>
-    <ListItemAvatar>
-      <StyledBadge
-        overlap="circular"
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        variant="dot"
-        >
-        <Avatar alt={connection.user.username} src={''}/>  
-      </StyledBadge>  
-    </ListItemAvatar>
-    <ListItemText
-      primary = {connection.user.username}
-    />
-  </ListItem>
-))}
-</List>
-
-
+      <List>
+          {connections.map(connection =>(
+            <ListItem key={connection.id} secondaryAction={
+              <IconButton edge="end" aria-label="mensagem" onClick={() => handleConnectToChat(connection.user.username, connection.user.id, connection.connected_user.id)}>
+                <ChatBubbleOutlineIcon />
+              </IconButton>
+            }>
+              <ListItemAvatar>
+                <StyledBadge
+                  overlap="circular"
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                  variant="dot"
+                >
+                  <Avatar alt={connection.user.username} src={''}/>  
+                </StyledBadge>  
+              </ListItemAvatar>
+              <ListItemText
+                primary={connection.user.username}
+              />
+            </ListItem>
+            
+          ))}
+        </List>
     </div>
   );
 };

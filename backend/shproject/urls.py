@@ -20,18 +20,19 @@ from django.conf import settings
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework import routers
 from backShProject.views import (profile, community, post, create_post, feed, chat, search, home, ProfileList, ProfileDetail, CommunityList, CommunityDetail, PostList, PostDetail, MessageList, MessageViewSet, FeedUser, CustomAuthToken, LikePost, ConnectedProfileList)
+from .consumers.consumidores import ChatConsumer
+from .consumers.routing import websocket_urlpatterns
 
 router = routers.DefaultRouter()
 router.register(r'messages', MessageViewSet, basename='message')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',home),
+    path('', home),
     path('community/<int:community_id>/', community, name='community'),
     path('post/<int:post_id>/', post, name='post'),
     path('create_post/', create_post, name='create_post'),
     path('feed/', feed, name='feed'),
-    path('chat/<str:username>/', chat, name='chat'),
     path('search/', search, name='search'),
     path('profiles/', ProfileList.as_view()),
     path('profile/', ProfileDetail.as_view(), name='profile-detail'),
@@ -48,6 +49,9 @@ urlpatterns = [
     path('posts/<int:post_id>/check_like/', LikePost.as_view(), name='post-check-like'),
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path('connected-profiles/', ConnectedProfileList.as_view(),name='connected_profiles'),
+    path('ws/chat/<str:room_name>/', ChatConsumer.as_asgi()),
+    path('ws/chat/<int:sender_id>/<int:receiver_id>/', ChatConsumer.as_asgi()),
+    path('ws/', include(websocket_urlpatterns)),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

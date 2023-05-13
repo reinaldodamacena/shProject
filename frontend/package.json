@@ -13,6 +13,7 @@
     "@testing-library/user-event": "^13.5.0",
     "ajv": "^8.12.0",
     "axios": "^1.4.0",
+    "channels-js": "^0.4.1",
     "moment": "^2.29.4",
     "nth-check": "^2.1.1",
     "react-dom": "^18.2.0",
@@ -24,7 +25,6 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

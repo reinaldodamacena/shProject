@@ -12,6 +12,8 @@ from .models import Profile, Community, Post, Feed, Message, Profile, Like
 from rest_framework import generics, permissions, status
 from .serializers import ProfileSerializer, CommunitySerializer, PostSerializer, MessageSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly, BasePermission
+from rest_framework.decorators import action
+
 
 
 
@@ -160,13 +162,25 @@ class IsConnectedProfileParticipant(BasePermission):
 
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
-    permission_classes = [IsAuthenticated, IsConnectedProfileParticipant]
+    permission_classes = [permissions.IsAuthenticated, IsConnectedProfileParticipant]
 
     def get_queryset(self):
-        return Message.objects.filter(sender=self.request.user)
+        user = self.request.user
+        return Message.objects.filter(models.Q(sender=user) | models.Q(receiver=user))
 
     def perform_create(self, serializer):
         serializer.save(sender=self.request.user)
+
+    @action(detail=True, methods=['get'])
+    def chat_history(self, request, pk=None):
+        other_user_id = request.GET.get('user_id')
+        messages = Message.objects.filter(
+            models.Q(sender_id=request.user.id, receiver_id=other_user_id) |
+            models.Q(sender_id=other_user_id, receiver_id=request.user.id)
+        ).order_by('created_at')
+        serializer = MessageSerializer(messages, many=True)
+        return Response(serializer.data)
+
 
 class FeedUser(generics.ListCreateAPIView):
     serializer_class = PostSerializer
