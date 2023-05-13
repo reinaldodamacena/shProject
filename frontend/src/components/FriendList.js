@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getConnectedProfiles } from '../Api';
+import { getConnectedProfiles, connectToChat } from '../Api';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import IconButton from '@mui/material/IconButton';
@@ -9,6 +9,8 @@ import Avatar from '@mui/material/Avatar';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { styled } from '@mui/material/styles';
 import Badge from '@mui/material/Badge';
+
+
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -41,6 +43,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 
 const FriendList = () => {
   const [connections, setConnections] = useState([]);
+  const [roomName, setRoomName] = useState('');
 
   useEffect(() => {
     const fetchConnections = async () => {
@@ -55,32 +58,42 @@ const FriendList = () => {
     fetchConnections();
   }, []);
 
+  const handleConnectToChat = (name) => {
+    setRoomName(name);
+    connectToChat(name, onMessageReceived);
+  };
+
+  const onMessageReceived = (message) => {
+    // Tratar a mensagem recebida
+  };
+
   return (
     <div className="friend-list">
-        <List>{connections.map(connection =>(
-          <ListItem secondaryAction={
-            <IconButton edge="end" aria-label="message">
-              <ChatBubbleOutlineIcon />
-            </IconButton>
-          }>
-            <ListItemAvatar>
-              <StyledBadge
-                overlap="circular"
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                variant="dot"
-                >
-                <Avatar alt={connection.user.username} src={''}/>  
-              </StyledBadge>  
-            </ListItemAvatar>
-            <ListItemText
-              primary = {connection.user.username}
-            />
-          </ListItem>
-        ))}            
-        </List>
+<List>{connections.map(connection =>(
+  <ListItem key={connection.id} secondaryAction={
+    <IconButton edge="end" aria-label="message" onClick={() => handleConnectToChat(connection.user.username)}>
+      <ChatBubbleOutlineIcon />
+    </IconButton>
+  }>
+    <ListItemAvatar>
+      <StyledBadge
+        overlap="circular"
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        variant="dot"
+        >
+        <Avatar alt={connection.user.username} src={''}/>  
+      </StyledBadge>  
+    </ListItemAvatar>
+    <ListItemText
+      primary = {connection.user.username}
+    />
+  </ListItem>
+))}
+</List>
+
+
     </div>
   );
 };
 
 export default FriendList;
-

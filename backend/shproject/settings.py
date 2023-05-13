@@ -83,6 +83,8 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = 'shproject.asgi.application'
+
 WSGI_APPLICATION = 'shproject.wsgi.application'
 
 
@@ -164,3 +166,4 @@ CHANNEL_LAYERS = {
         'ROUTING': 'myapp.routing.websocket_urlpatterns',
     },
 }
+

@@ -150,9 +150,17 @@ class IsParticipant(BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user in obj.participants.all()
 
+
+class IsConnectedProfileParticipant(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        connected_profile = obj.connected_profile
+        return connected_profile in user.profile.connections.all()
+
+
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsConnectedProfileParticipant]
 
     def get_queryset(self):
         return Message.objects.filter(sender=self.request.user)
