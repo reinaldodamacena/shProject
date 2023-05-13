@@ -18,7 +18,11 @@ from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
 from rest_framework.authtoken.views import obtain_auth_token
-from backShProject.views import (profile, community, post, create_post, feed, chat, search, home, ProfileList, ProfileDetail, CommunityList, CommunityDetail, PostList, PostDetail, MessageList, MessageDetail, FeedUser, CustomAuthToken, LikePost, ConnectedProfileList)
+from rest_framework import routers
+from backShProject.views import (profile, community, post, create_post, feed, chat, search, home, ProfileList, ProfileDetail, CommunityList, CommunityDetail, PostList, PostDetail, MessageList, MessageViewSet, FeedUser, CustomAuthToken, LikePost, ConnectedProfileList)
+
+router = routers.DefaultRouter()
+router.register(r'messages', MessageViewSet, basename='message')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -36,7 +40,7 @@ urlpatterns = [
     path('posts/', PostList.as_view()),
     path('posts/<int:pk>/', PostDetail.as_view()),
     path('messages/', MessageList.as_view()),
-    path('messages/<int:pk>/', MessageDetail.as_view()),
+    path('', include(router.urls)),
     path('FeedUser/', FeedUser.as_view(), name='feed-user-list'),
     path('api-token-auth/', CustomAuthToken.as_view()),
     path('__debug__/', include('debug_toolbar.urls', namespace='djdt')),

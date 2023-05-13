@@ -60,9 +60,6 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    sender = UserSerializer(read_only=True)
-    receiver = UserSerializer(read_only=True)
-
     class Meta:
         model = Message
-        fields = ('id','sender','receiver', 'content', 'created_at')
+        fields = '__all__'

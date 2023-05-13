@@ -7,6 +7,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from .forms import PostForm
+from rest_framework import viewsets
 from .models import Profile, Community, Post, Feed, Message, Profile, Like
 from rest_framework import generics, permissions, status
 from .serializers import ProfileSerializer, CommunitySerializer, PostSerializer, MessageSerializer
@@ -149,10 +150,15 @@ class IsParticipant(BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user in obj.participants.all()
 
-class MessageDetail(generics.RetrieveAPIView):
-    queryset = Message.objects.all()
+class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
-    permission_classes = [IsAuthenticated, IsParticipant]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Message.objects.filter(sender=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(sender=self.request.user)
 
 class FeedUser(generics.ListCreateAPIView):
     serializer_class = PostSerializer
