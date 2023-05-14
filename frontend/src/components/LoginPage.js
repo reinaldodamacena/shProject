@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../Api'; // Importe a função de login do arquivo Api.js
+import "./LoginPage.css";
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -44,19 +45,26 @@ const LoginPage = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Username:
-        <input type="text" value={username} onChange={handleUsernameChange} />
-      </label>
-      <br />
-      <label>
-        Password:
-        <input type="password" value={password} onChange={handlePasswordChange} />
-      </label>
-      <br />
-      <button type="submit">Login</button>
-    </form>
+    <div clssName="login">
+      <h1>Login</h1>
+      <div className='image'>
+        <img src='../assets/images/image.png'/>
+      </div>
+      <h2>ConnectHeroes</h2>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Username:
+          <input type="text" value={username} onChange={handleUsernameChange} />
+        </label>
+        <br />
+        <label>
+          Password:
+          <input type="password" value={password} onChange={handlePasswordChange} />
+        </label>
+        <br />
+        <button type="submit">Login</button>
+      </form>
+    </div>
   );
 };
 
