@@ -102,5 +102,17 @@ export const getConnectedProfiles = async () => {
 
 
 
+export const getCommunitiesOfLoggedInUser = async () => {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const response = await api.get(LOGIN_ROUTE, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      },
+    });
 
-
+    return response.data;
+  } catch (error) {
+    throw new Error('Erro ao obter comunidades do usuário logado: ' + error.message);
+  }
+};
