@@ -100,13 +100,14 @@ export const getConnectedProfiles = async () => {
   }
 };
 
+
 export function connectToChat(roomName, senderId, receiverId, onMessageReceived) {
   const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const formattedRoomName = roomName.replace(/\W/g, '');
-  const wsURL = `${wsScheme}//${window.location.host}${CHAT_ROUTE}${formattedRoomName}/`;
+  let wsURL = `${wsScheme}//${window.location.host}${CHAT_ROUTE}${formattedRoomName}/`; // let ao invés de const
 
   if (senderId && receiverId) {
-    wsURL += `${senderId}/${receiverId}/`;
+    wsURL += `${senderId}/${receiverId}/`; // agora é permitido, já que wsURL é uma variável let
   }
 
   const socket = new WebSocket(wsURL);
@@ -117,5 +118,6 @@ export function connectToChat(roomName, senderId, receiverId, onMessageReceived)
 
   return socket;
 }
+
 
 

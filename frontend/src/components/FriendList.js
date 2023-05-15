@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getConnectedProfiles, connectToChat } from '../Api';
+import { getConnectedProfiles, connectToChat, getProfileData } from '../Api';
 import { CHAT_ROUTE } from '../apiRoutes';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -42,36 +42,48 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 
 const FriendList = () => {
   const [connections, setConnections] = useState([]);
-  const [roomName, setRoomName] = useState('');
-  const [senderId, setSenderId] = useState(null);
-  const [receiverId, setReceiverId] = useState(null);
+  const [profileData, setProfileData] = useState(null);
 
   useEffect(() => {
     const fetchConnections = async () => {
       try {
         const data = await getConnectedProfiles();
         setConnections(data);
+        console.log('profileData:', data);
       } catch (error) {
         console.error('Erro ao obter as conexões:', error);
       }
     };
 
+    const fetchProfileData = async () => {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        console.log('authToken:', authToken);
+        const data = await getProfileData(authToken);
+        console.log('profileData:', data);
+        setProfileData(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    
     fetchConnections();
+    fetchProfileData();
   }, []);
 
-  const handleConnectToChat = (name, senderId, receiverId) => {
+  const handleConnectToChat = (connection) => {
+    const name = connection.name;
+    const senderId = profileData?.id; // ID do usuário logado
+    const receiverId = connection.id; // ID da conexão
+
     if (name && senderId && receiverId) {
-      setRoomName(name);
-      setSenderId(senderId);
-      setReceiverId(receiverId);
       const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const formattedRoomName = name.replace(/\W/g, '');
-      const wsURL = `${wsScheme}//${window.location.host}${CHAT_ROUTE}${formattedRoomName}/`; // Use a URL correta para acessar a rota do chat websocket
-      connectToChat(wsURL, senderId, receiverId, onMessageReceived); // Passe a URL correta como primeiro parâmetro
+      const wsURL = `${wsScheme}//${window.location.host}${CHAT_ROUTE}${formattedRoomName}/`;
+      connectToChat(wsURL, senderId, receiverId, onMessageReceived);
       console.log('name:', name);
     }
   };
-  
 
   const onMessageReceived = (message) => {
     // Tratar a mensagem recebida
@@ -82,9 +94,10 @@ const FriendList = () => {
       <List>
           {connections.map(connection =>(
             <ListItem key={connection.id} secondaryAction={
-              <IconButton edge="end" aria-label="mensagem" onClick={() => handleConnectToChat(connection.user.username, connection.user.id, connection.connected_user.id)}>
-                <ChatBubbleOutlineIcon />
-              </IconButton>
+              <IconButton edge="end" aria-label="mensagem" onClick={() => handleConnectToChat(connection)}>
+              <ChatBubbleOutlineIcon />
+            </IconButton>
+            
             }>
               <ListItemAvatar>
                 <StyledBadge

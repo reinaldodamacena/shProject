@@ -13,12 +13,21 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'first_name', 'last_name')
 
-class ProfileSerializer(serializers.ModelSerializer):
+class ConnectionSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer(read_only=True)
 
     class Meta:
         model = Profile
-        fields = ['user', 'bio', 'avatar', 'connections', 'background_image']
+        fields = ['id', 'user', 'bio', 'avatar']
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = CustomUserSerializer(read_only=True)
+    connections = ConnectionSerializer(many=True)
+
+    class Meta:
+        model = Profile
+        fields = ['id', 'user', 'bio', 'avatar', 'connections', 'background_image']
+
 
 class CommunitySerializer(serializers.ModelSerializer):
     members = UserSerializer(many=True, read_only=True)
