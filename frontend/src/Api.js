@@ -116,3 +116,65 @@ export const getCommunitiesOfLoggedInUser = async () => {
     throw new Error('Erro ao obter comunidades do usuário logado: ' + error.message);
   }
 };
+
+export const getCommunityDetails = async (id) => {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const response = await api.get(`${COMMUNITY_ROUTE}${id}/`, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw new Error('Erro ao obter detalhes da comunidade: ' + error.message);
+  }
+};
+
+export const createPostCommunity = async (formData, id) => {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const response = await api.post(`${COMMUNITY_ROUTE}${id}/posts/`, formData, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    if (response.status === 201) {
+      return response.data;
+    } else {
+      throw new Error('Erro ao criar a publicação na comunidade');
+    }
+  } catch (error) {
+    throw new Error('Erro ao criar a publicação na comunidade: ' + error.message);
+  }
+};
+
+
+
+export const getCommunityPosts = async (id) => {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const response = await api.get(`${COMMUNITY_ROUTE}${id}/posts/`, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw new Error('Erro ao obter posts da comunidade: ' + error.message);
+  }
+};
+
+export const searchCommunityByName = async (searchQuery) => {
+  try {
+    const response = await api.get(`${COMMUNITY_ROUTE}?name__icontains=${searchQuery}`);
+    return response.data;
+  } catch (error) {
+    throw new Error('Erro ao pesquisar comunidade: ' + error.message);
+  }
+};
+

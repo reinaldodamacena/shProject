@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { getCommunitiesOfLoggedInUser } from '../Api'; // Substitua por sua localização de arquivo real
+import { useNavigate } from 'react-router-dom';
+import { getCommunitiesOfLoggedInUser, searchCommunityByName } from '../Api'; // Substitua por sua localização de arquivo real
+import SearchCommunity from './SearchCommunity';
 import './Communities.css';
 
-const PaginatedCommunities = () => {
+const Communities = () => {
   const [communities, setCommunities] = useState([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const navigate = useNavigate();
+
+  const goToCommunity = (id) => {
+    navigate(`/comunidade/${id}`);
+  };
+
+  const handleSearch = async (results) => {
+    setCommunities(results);
+  };
 
   useEffect(() => {
     const fetchPage = async () => {
@@ -19,11 +30,13 @@ const PaginatedCommunities = () => {
 
   return (
     <div className="communities-container">
+      <SearchCommunity onSearch={handleSearch} />
+
       {communities.map((community) => (
-        <div key={community.id} className="community">
+        <div key={community.id} className="community" onClick={() => goToCommunity(community.id)}>
           <h1>{community.name}</h1>
           <p>{community.description}</p>
-          <p>{community.members.length}</p>
+          <p>Quantidade de membros: {community.members.length}</p>
         </div>
       ))}
       <button className="pagination-button" disabled={!hasMore} onClick={() => setPage((prev) => prev + 1)}>
@@ -33,4 +46,4 @@ const PaginatedCommunities = () => {
   );
 };
 
-export default PaginatedCommunities;
+export default Communities;

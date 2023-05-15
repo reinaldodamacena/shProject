@@ -1,10 +1,10 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './components/Home';
 import LoginPage from './components/LoginPage';
-import SignIn from './components/SigIn';
 import Communities from './components/Communities';
-
+import CommunityDetails from './components/CommunityDetails';
+import SearchResults from './components/SearchResults';
 
 function App() {
   return (
@@ -13,6 +13,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/comunidade" element={<Communities />} />
+        <Route path="/comunidade/:id" element={<CommunityDetails />} />
+        <Route path="/search" element={<SearchResults />} />
       </Routes>
     </div>
   );
