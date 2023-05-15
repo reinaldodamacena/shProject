@@ -1,24 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { connectToChat } from '../Api';
-import { CHAT_ROUTE, API_BASE_URL } from '../apiRoutes';
+import { CHAT_ROUTE } from '../apiRoutes';
+import { useLocation } from 'react-router-dom';
 
-const Chat = ({ match, senderId, receiverId }) => {
+const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const socketRef = useRef(null);
-  const roomName = match?.params?.roomName || null;
-
-  const onMessageReceived = (message) => {
-    setMessages((prevMessages) => [...prevMessages, message]);
-  };
+  const location = useLocation();
+  const roomName = location?.state?.name || null;
+  const senderId = location?.state?.senderId || null;
+  const receiverId = location?.state?.receiverId || null;
 
   useEffect(() => {
-    const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsHostname = window.location.hostname;
-    const wsURL = `${wsScheme}//${wsHostname}:8000${CHAT_ROUTE}${roomName}/${senderId}/${receiverId}/`;
-
+    
     if (roomName && senderId && receiverId) {
-      socketRef.current = connectToChat(wsURL, onMessageReceived);
+      socketRef.current = connectToChat(roomName, senderId, receiverId, onMessageReceived);      
+      
+      
     }
 
     return () => {
@@ -26,19 +25,35 @@ const Chat = ({ match, senderId, receiverId }) => {
         socketRef.current.close();
       }
     };
-  }, [roomName, senderId, receiverId]);
+}, [roomName, senderId, receiverId]);
 
-  const handleInputKeyPress = (event) => {
-    if (event.key === 'Enter' && socketRef.current) {
-      const messageObject = {
-        message: inputValue,
-        receiver_id: receiverId
-      };
-      socketRef.current.send(JSON.stringify(messageObject));
-      setInputValue('');
+  const onMessageReceived = (message) => {
+    console.log('Received message:', message);
+    setMessages((prevMessages) => [...prevMessages, message]);
+  };
+
+  const handleSendMessage = () => {
+    if (inputValue.trim() !== '') {
+      // Make sure the WebSocket is open before trying to send a message
+      if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+        const messageObject = {
+          message: inputValue,
+          receiver_id: receiverId,
+        };
+        console.log('Sending message:', messageObject);
+        socketRef.current.send(JSON.stringify(messageObject));
+        setInputValue('');
+      } else {
+        console.log('The WebSocket is not open.');
+      }
     }
-  }
+  };
   
+
+  console.log('Room Name:', roomName);
+  console.log('Sender ID:', senderId);
+  console.log('Receiver ID:', receiverId);
+
   return (
     <div>
       <h1>Chat: {roomName}</h1>
@@ -47,11 +62,11 @@ const Chat = ({ match, senderId, receiverId }) => {
           <li key={index}>{message.message}</li>
         ))}
       </ul>
-      <input 
-        value={inputValue} 
-        onChange={(event) => setInputValue(event.target.value)} 
-        onKeyPress={handleInputKeyPress} 
+      <input
+        value={inputValue}
+        onChange={(event) => setInputValue(event.target.value)}
       />
+      <button onClick={handleSendMessage}>Enviar</button>
     </div>
   );
 };

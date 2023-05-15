@@ -94,7 +94,7 @@ const FriendList = () => {
       console.log('Connection established:', name);
   
       // navigate to the chat route
-      navigate(`/chat/${formattedRoomName}`);
+      navigate(`/chat/${formattedRoomName}`, { state: { name,senderId, receiverId } });
     }
   };
 
