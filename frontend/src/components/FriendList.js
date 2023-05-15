@@ -83,9 +83,9 @@ const handleConnectToChat = (connection) => {
   if (name && senderId && receiverId) {
     const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const formattedRoomName = name.replace(/\W/g, '');
-    const wsURL = `${wsScheme}//${window.location.host}${CHAT_ROUTE}${formattedRoomName}/`;
+    const wsURL = `${wsScheme}//${window.location.host}/ws/chat/${formattedRoomName}/${senderId}/${receiverId}/`;
     connectToChat(wsURL, senderId, receiverId, onMessageReceived);
-    console.log('Connection established:', connection.name.username);
+    console.log('Connection established:', name);
   }
 };
 
