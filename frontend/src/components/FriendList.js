@@ -71,19 +71,24 @@ const FriendList = () => {
     fetchProfileData();
   }, []);
 
-  const handleConnectToChat = (connection) => {
-    const name = connection.name;
-    const senderId = profileData?.id; // ID do usuário logado
-    const receiverId = connection.id; // ID da conexão
+const handleConnectToChat = (connection) => {
+  const name = connection.user.username;
+  const senderId = profileData ? profileData.id : null; // ID do usuário logado
+  const receiverId = connection.id; // ID da conexão
 
-    if (name && senderId && receiverId) {
-      const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const formattedRoomName = name.replace(/\W/g, '');
-      const wsURL = `${wsScheme}//${window.location.host}${CHAT_ROUTE}${formattedRoomName}/`;
-      connectToChat(wsURL, senderId, receiverId, onMessageReceived);
-      console.log('name:', name);
-    }
-  };
+  console.log('name:', name);
+  console.log('senderId:', senderId);
+  console.log('receiverId:', receiverId);
+
+  if (name && senderId && receiverId) {
+    const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const formattedRoomName = name.replace(/\W/g, '');
+    const wsURL = `${wsScheme}//${window.location.host}${CHAT_ROUTE}${formattedRoomName}/`;
+    connectToChat(wsURL, senderId, receiverId, onMessageReceived);
+    console.log('Connection established:', connection.name.username);
+  }
+};
+
 
   const onMessageReceived = (message) => {
     // Tratar a mensagem recebida
@@ -93,12 +98,12 @@ const FriendList = () => {
     <div className="friend-list">
       <List>
           {connections.map(connection =>(
-            <ListItem key={connection.id} secondaryAction={
-              <IconButton edge="end" aria-label="mensagem" onClick={() => handleConnectToChat(connection)}>
-              <ChatBubbleOutlineIcon />
-            </IconButton>
-            
-            }>
+       <ListItem key={connection.id} secondaryAction={
+        <IconButton edge="end" aria-label="mensagem" onClick={() => handleConnectToChat(connection)}>
+          <ChatBubbleOutlineIcon />
+        </IconButton>
+      }>
+      
               <ListItemAvatar>
                 <StyledBadge
                   overlap="circular"
