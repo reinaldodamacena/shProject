@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { LOGIN_ROUTE, POSTS_ROUTE, FEED_USER_ROUTE, PROFILE_ROUTE, PROFILE_CONN } from './apiRoutes';
+import { API_BASE_URL,LOGIN_ROUTE, POSTS_ROUTE, FEED_USER_ROUTE, PROFILE_ROUTE, PROFILE_CONN,COMMUNITY_ROUTE} from './apiRoutes';
 
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000', // Altere a URL base da sua API conforme necessário
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -105,7 +105,7 @@ export const getConnectedProfiles = async () => {
 export const getCommunitiesOfLoggedInUser = async () => {
   try {
     const authToken = localStorage.getItem('authToken');
-    const response = await api.get(LOGIN_ROUTE, {
+    const response = await api.get(COMMUNITY_ROUTE, {
       headers: {
         Authorization: `Token ${authToken}`,
       },

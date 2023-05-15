@@ -19,7 +19,7 @@
     box-shadow: 2px 4px 8px #a39797;
   }
   
-  h1, h2{
+  .login > h1,.login > h2{
     font-family:'Kalam', cursive;
     font-size: 2.5rem;
     margin-bottom: 1rem;

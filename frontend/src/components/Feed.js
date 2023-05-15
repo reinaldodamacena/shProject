@@ -28,7 +28,8 @@ const Feed = () => {
         return (
           <Post
             key={post.id}
-            user={post.profile.user}
+            user={post.user}
+            profile={post.profile}
             content={post.content}
             image={post.image}
             timestamp={post.timestamp}

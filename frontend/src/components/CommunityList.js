@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getCommunitiesOfLoggedInUser } from '../Api'; 
+import { getCommunitiesOfLoggedInUser } from '../Api';
 
 const CommunityList = () => {
   const [communities, setCommunities] = useState([]);

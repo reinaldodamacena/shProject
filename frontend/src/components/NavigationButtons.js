@@ -1,32 +1,35 @@
-import React, { useState } from 'react';
-import CommunityList from './CommunityList'; // Substitua por sua localização de arquivo real
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import Button from '@mui/material/Button';
+import './NavigationButtons.css';
 
-const NavigationButtons = () => {
-  const [showCommunities, setShowCommunities] = useState(false);
+const NavigationButtons = ({ isOnCommunityPage, onToggleCommunities }) => {
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     // Remover o token de autenticação do localStorage
     localStorage.removeItem('authToken');
 
     // Redirecionar o usuário para a página de login ou para a página inicial não autenticada
-    window.location.href = '/login'; // Ou qualquer outro redirecionamento desejado
+    navigate('/login');
   };
 
-  const toggleCommunityList = () => {
-    setShowCommunities(!showCommunities);
-  }
+  const handleTogglePage = () => {
+    onToggleCommunities();
+  };
 
   return (
     <div>
       <nav className="navigation-buttons">
         {/* Botão Conexões */}
-        <button>Conexões</button>
-        {/* Botão Comunidade */}
-        <button onClick={toggleCommunityList}>Comunidade</button>
+        <Button variant="outlined">Conexões</Button>
+        {/* Botão Comunidade ou Feed */}
+        <Button variant="outlined" onClick={handleTogglePage}>
+          {isOnCommunityPage ? 'Feed' : 'Comunidade'}
+        </Button>
         {/* Botão Sair */}
-        <button onClick={handleLogout}>Sair</button>
+        <Button variant="outlined" onClick={handleLogout}>Sair</Button>
       </nav>
-      {showCommunities && <CommunityList />}
     </div>
   );
 };
