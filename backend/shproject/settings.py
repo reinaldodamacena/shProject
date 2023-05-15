@@ -161,9 +161,7 @@ REST_FRAMEWORK = {
     ),
 }
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-        'ROUTING': 'myapp.routing.websocket_urlpatterns',
-    },
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
 }
-

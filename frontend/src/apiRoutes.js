@@ -6,4 +6,4 @@ export const FEED_USER_ROUTE = '/FeedUser/';
 export const PROFILE_ROUTE = '/profile/'
 export const PROFILE_CONN = '/connected-profiles/'
 export const MESSAGE_LIST_URL = `${API_BASE_URL}/messages/`;
-export const CHAT_ROUTE = '/chat/'
+export const CHAT_ROUTE = '/ws/chat/';

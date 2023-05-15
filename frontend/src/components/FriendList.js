@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getConnectedProfiles, connectToChat, getProfileData } from '../Api';
-import { CHAT_ROUTE } from '../apiRoutes';
+import { API_BASE_URL, CHAT_ROUTE } from '../apiRoutes';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import IconButton from '@mui/material/IconButton';
@@ -10,6 +11,8 @@ import Avatar from '@mui/material/Avatar';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { styled } from '@mui/material/styles';
 import Badge from '@mui/material/Badge';
+
+
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -43,6 +46,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 const FriendList = () => {
   const [connections, setConnections] = useState([]);
   const [profileData, setProfileData] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchConnections = async () => {
@@ -71,23 +75,28 @@ const FriendList = () => {
     fetchProfileData();
   }, []);
 
-const handleConnectToChat = (connection) => {
-  const name = connection.user.username;
-  const senderId = profileData ? profileData.id : null; // ID do usuário logado
-  const receiverId = connection.id; // ID da conexão
-
-  console.log('name:', name);
-  console.log('senderId:', senderId);
-  console.log('receiverId:', receiverId);
-
-  if (name && senderId && receiverId) {
-    const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const formattedRoomName = name.replace(/\W/g, '');
-    const wsURL = `${wsScheme}//${window.location.host}/ws/chat/${formattedRoomName}/${senderId}/${receiverId}/`;
-    connectToChat(wsURL, senderId, receiverId, onMessageReceived);
-    console.log('Connection established:', name);
-  }
-};
+  const handleConnectToChat = (connection) => {
+    const name = connection.user.username;
+    const senderId = profileData ? profileData.id : null; // ID do usuário logado
+    const receiverId = connection.id; // ID da conexão
+    
+  
+    console.log('name:', name);
+    console.log('senderId:', senderId);
+    console.log('receiverId:', receiverId);
+  
+    if (name && senderId && receiverId) {
+      const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const formattedRoomName = name.replace(/\W/g, '');
+      let wsURL = `${wsScheme}//${window.location.hostname}:8000${CHAT_ROUTE}${formattedRoomName}/`; // alterado para a porta 8000
+      connectToChat(formattedRoomName, senderId, receiverId, onMessageReceived);
+  
+      console.log('Connection established:', name);
+  
+      // navigate to the chat route
+      navigate(`/chat/${formattedRoomName}`);
+    }
+  };
 
 
   const onMessageReceived = (message) => {
@@ -100,7 +109,7 @@ const handleConnectToChat = (connection) => {
           {connections.map(connection =>(
        <ListItem key={connection.id} secondaryAction={
         <IconButton edge="end" aria-label="mensagem" onClick={() => handleConnectToChat(connection)}>
-          <ChatBubbleOutlineIcon />
+            <ChatBubbleOutlineIcon />
         </IconButton>
       }>
       
