@@ -81,34 +81,27 @@ const FriendList = () => {
   };
 
   const handleConnectToChat = (connection) => {
-    const name = connection.user.username;
     const senderId = profileData ? profileData.id : null; // ID do usuário logado
     const receiverId = connection.id; // ID da conexão
     const token = localStorage.getItem('authToken'); // Recupere o token aqui
-    
 
-
-    
-  
-    console.log('name:', name);
     console.log('senderId:', senderId);
     console.log('receiverId:', receiverId);
     console.log('token:',token);
 
-    
-  
-    if (name && senderId && receiverId && token) {
+    if (senderId && receiverId && token) {
       const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const formattedRoomName = name.replace(/\W/g, '');
+      const formattedRoomName = [senderId, receiverId].sort().join('_');
       let wsURL = `${wsScheme}//${window.location.hostname}:8000${CHAT_ROUTE}${formattedRoomName}/`;
       connectToChat(formattedRoomName, senderId, receiverId, token, onMessageReceived);
     
-      console.log('Connection established:', name);
+      console.log('Connection established:', formattedRoomName);
     
       // navigate to the chat route
-      navigate(`/chat/${formattedRoomName}`, { state: { name,senderId, receiverId } });
+      navigate(`ws/chat/${formattedRoomName}`, { state: { name: formattedRoomName, senderId, receiverId } });
     }
   };
+
 
   return (
     <div className="friend-list">

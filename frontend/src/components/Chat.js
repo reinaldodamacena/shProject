@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { connectToChat } from '../Api';
 import { CHAT_ROUTE } from '../apiRoutes';
 import { useLocation } from 'react-router-dom';
+import { ChatContainer, MessageList, Message, Input, SendButton } from './ChatStyle';
+import SendIcon from '@mui/icons-material/Send';
 
 const Chat = () => {
   const [messages, setMessages] = useState([]);
@@ -14,10 +16,30 @@ const Chat = () => {
   const token = localStorage.getItem('authToken');
 
   const onMessageReceivedRef = useRef();
-  onMessageReceivedRef.current = (message) => {
-    console.log('Received message:', message);
-    setMessages((prevMessages) => [...prevMessages, message]);
+  onMessageReceivedRef.current = (messageData) => {
+    console.log('Received message data:', messageData);
+    
+    let message;
+    
+    if (typeof messageData === 'string') {
+      message = JSON.parse(messageData);
+    } else 
+    if (typeof messageData === 'object') {
+      message = messageData;
+    } else {
+      console.error('Unexpected type of messageData:', typeof messageData);
+      return;
+    }
+  
+    console.log('Parsed message:', message);
+    
+    if (message.command === 'messages') {
+      setMessages(message.messages);
+    } else {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    }
   };
+  
 
   useEffect(() => {    
     if (roomName && senderId && receiverId) {
@@ -56,20 +78,31 @@ const Chat = () => {
   console.log('Sender ID:', senderId);
   console.log('Receiver ID:', receiverId);
 
+
+  
   return (
-    <div>
+    <ChatContainer>
       <h1>Chat: {roomName}</h1>
-      <ul>
+      <MessageList>
         {messages.map((message, index) => (
-          <li key={index}>{message.message}</li>
+          <Message key={index}>
+            <strong>{message.sender_first_name}: </strong>
+            {message.content}
+          </Message>
         ))}
-      </ul>
-      <input
-        value={inputValue}
-        onChange={(event) => setInputValue(event.target.value)}
-      />
-      <button onClick={handleSendMessage}>Enviar</button>
-    </div>
+      </MessageList>
+      <div>
+        <Input
+          value={inputValue}
+          onChange={(event) => setInputValue(event.target.value)}
+        />
+        <SendButton onClick={handleSendMessage} startIcon={<SendIcon />}>
+          Enviar
+        </SendButton>
+      </div>
+    </ChatContainer>
+
+
   );
 };
 

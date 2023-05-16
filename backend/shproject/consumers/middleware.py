@@ -5,7 +5,5 @@ from django.db import close_old_connections
 class CookieAndSessionMiddleware(BaseMiddleware):
     async def __call__(self, scope, receive, send):
         close_old_connections()
-        scope, receive, send = await CookieMiddleware(
-            SessionMiddleware(super().__call__)
-        )(scope, receive, send)
-        return await super().__call__(scope, receive, send)
+        middleware_stack = CookieMiddleware(SessionMiddleware(super().__call__))
+        return await middleware_stack(scope, receive, send)

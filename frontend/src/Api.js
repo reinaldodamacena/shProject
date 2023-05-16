@@ -107,15 +107,19 @@ export const connectToChat = (roomName, senderId, receiverId, token, onMessageRe
   
   const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const wsURL = `${wsScheme}//${window.location.hostname}:8000/ws/chat/${roomName}/${senderId}/${receiverId}/?token=${token}`;
-
+  console.log('Connecting to WebSocket at URL:', wsURL);
   const socket = new WebSocket(wsURL);
 
   socket.onmessage = (event) => {
+    try {
       const data = JSON.parse(event.data);
       console.log('Inside onmessage, onMessageReceived is:', onMessageReceived);
       console.log('Type of onMessageReceived:', typeof onMessageReceived);
       onMessageReceived(data);
-  };
+    } catch (error) {
+      console.error('Failed to parse message data:', event.data, 'Error:', error);
+    }
+  }
 
   return socket;
 };
