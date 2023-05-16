@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ObjectDoesNotExist
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.http import HttpResponseForbidden
@@ -29,7 +30,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_profile(self, user):
-        return user.profile
+        if user.is_authenticated:
+            return user.profile
+        else:
+            return None
 
    
     @database_sync_to_async
@@ -43,6 +47,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return message
         except ObjectDoesNotExist:
             # Trate aqui o caso em que o objeto não existe
+            return None
+    @database_sync_to_async
+    def get_user_instance(self, user):
+        if user.is_authenticated:
+            return User.objects.get(pk=user.pk)
+        else:
             return None
 
     async def connect(self):
@@ -71,10 +81,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         receiver = await self.get_user(receiver_id)
         connected_profile = await self.get_connected_profile(receiver)
-
-        sender = self.scope['user']
+        sender = await self.get_user_instance(self.scope['user'])
         sender_profile = await self.get_profile(sender)
-
+    
         def check_sender_profile():
             return sender_profile in connected_profile
 
@@ -82,7 +91,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.save_message(sender, receiver, message)
             # Enviar mensagem de erro para o cliente
             error_message = {
-                'error': 'Permission denied'
+                'mensagem': 'Mensagem Envida'
             }
             await self.send(json.dumps(error_message))
             return
