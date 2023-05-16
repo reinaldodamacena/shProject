@@ -2,21 +2,28 @@ import React, { useState } from 'react';
 import './FormularioCadastro.css'
 
 function CadastroForm() {
-  const [nome, setNome] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Aqui você pode fazer algo com as informações do formulário, como enviar para um servidor.
-    console.log(`Nome: ${nome}, E-mail: ${email}, Senha: ${senha}`);
+    console.log(`firstName: ${firstName}, LastName: ${lastName}, E-mail: ${email}, Senha: ${senha}`);
   };
 
-  return (
-    <form onSubmit={handleSubmit}>
+  return (<div className='formulario'>
+      <h1 className='formularioText'>Formulário</h1>
+      <h2 className='textLogo'>ConnectHeroes</h2>
+      <form className="register" onSubmit={handleSubmit}>
       <label>
-        Nome:
-        <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} />
+       First name: 
+        <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+      </label>
+      <label>
+        Last name: 
+        <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
       </label>
       <label>
         E-mail:
@@ -28,6 +35,8 @@ function CadastroForm() {
       </label>
       <button type="submit">Cadastrar</button>
     </form>
+  </div>
+    
   );
 }
 
