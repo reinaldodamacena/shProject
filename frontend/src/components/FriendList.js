@@ -47,6 +47,7 @@ const FriendList = () => {
   const [connections, setConnections] = useState([]);
   const [profileData, setProfileData] = useState(null);
   const navigate = useNavigate();
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     const fetchConnections = async () => {
@@ -74,12 +75,18 @@ const FriendList = () => {
     fetchConnections();
     fetchProfileData();
   }, []);
+  const onMessageReceived = (message) => {
+    console.log('Received message:', message);
+    setMessages((prevMessages) => [...prevMessages, message]);
+  };
 
   const handleConnectToChat = (connection) => {
     const name = connection.user.username;
     const senderId = profileData ? profileData.id : null; // ID do usuário logado
     const receiverId = connection.id; // ID da conexão
     const token = localStorage.getItem('authToken'); // Recupere o token aqui
+    
+
 
     
   
@@ -87,24 +94,20 @@ const FriendList = () => {
     console.log('senderId:', senderId);
     console.log('receiverId:', receiverId);
     console.log('token:',token);
+
+    
   
     if (name && senderId && receiverId && token) {
       const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const formattedRoomName = name.replace(/\W/g, '');
       let wsURL = `${wsScheme}//${window.location.hostname}:8000${CHAT_ROUTE}${formattedRoomName}/`;
       connectToChat(formattedRoomName, senderId, receiverId, token, onMessageReceived);
-
-  
+    
       console.log('Connection established:', name);
-  
+    
       // navigate to the chat route
       navigate(`/chat/${formattedRoomName}`, { state: { name,senderId, receiverId } });
     }
-  };
-
-
-  const onMessageReceived = (message) => {
-    // Tratar a mensagem recebida
   };
 
   return (

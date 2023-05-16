@@ -102,6 +102,9 @@ export const getConnectedProfiles = async () => {
 
 
 export const connectToChat = (roomName, senderId, receiverId, token, onMessageReceived) => {
+  console.log('Inside connectToChat, onMessageReceived is:', onMessageReceived);
+  console.log('Type of onMessageReceived:', typeof onMessageReceived);
+  
   const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const wsURL = `${wsScheme}//${window.location.hostname}:8000/ws/chat/${roomName}/${senderId}/${receiverId}/?token=${token}`;
 
@@ -109,6 +112,8 @@ export const connectToChat = (roomName, senderId, receiverId, token, onMessageRe
 
   socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      console.log('Inside onmessage, onMessageReceived is:', onMessageReceived);
+      console.log('Type of onMessageReceived:', typeof onMessageReceived);
       onMessageReceived(data);
   };
 

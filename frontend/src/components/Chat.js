@@ -11,26 +11,28 @@ const Chat = () => {
   const roomName = location?.state?.name || null;
   const senderId = location?.state?.senderId || null;
   const receiverId = location?.state?.receiverId || null;
+  const token = localStorage.getItem('authToken');
 
-  useEffect(() => {
-    
+  const onMessageReceivedRef = useRef();
+  onMessageReceivedRef.current = (message) => {
+    console.log('Received message:', message);
+    setMessages((prevMessages) => [...prevMessages, message]);
+  };
+
+  useEffect(() => {    
     if (roomName && senderId && receiverId) {
-      socketRef.current = connectToChat(roomName, senderId, receiverId, onMessageReceived);      
-      
-      
+      console.log('onMessageReceived function:', onMessageReceivedRef.current);
+      socketRef.current = connectToChat(roomName, senderId, receiverId, token, onMessageReceivedRef.current);              
     }
-
+  
     return () => {
       if (socketRef.current) {
         socketRef.current.close();
       }
     };
-}, [roomName, senderId, receiverId]);
+  }, [roomName, senderId, receiverId]);
+  
 
-  const onMessageReceived = (message) => {
-    console.log('Received message:', message);
-    setMessages((prevMessages) => [...prevMessages, message]);
-  };
 
   const handleSendMessage = () => {
     if (inputValue.trim() !== '') {
