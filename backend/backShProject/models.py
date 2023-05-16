@@ -26,7 +26,7 @@ class Community(models.Model):
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
-    image = models.ImageField(upload_to='posts/', null=True, blank=True)
+    file = models.FileField(upload_to='posts/', null=True, blank=True)  # Substitui o campo 'image'
     timestamp = models.DateTimeField(auto_now_add=True)
     likes = models.ManyToManyField(User, blank=True, related_name='post_likes')
 
