@@ -101,9 +101,9 @@ export const getConnectedProfiles = async () => {
 };
 
 
-export const connectToChat = (roomName, senderId, receiverId, onMessageReceived) => {
+export const connectToChat = (roomName, senderId, receiverId, token, onMessageReceived) => {
   const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const wsURL = `${wsScheme}//${window.location.hostname}:8000/ws/chat/${roomName}/${senderId}/${receiverId}/`;
+  const wsURL = `${wsScheme}//${window.location.hostname}:8000/ws/chat/${roomName}/${senderId}/${receiverId}/?token=${token}`;
 
   const socket = new WebSocket(wsURL);
 
