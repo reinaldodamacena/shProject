@@ -21,8 +21,6 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path='/cadastro' element={<CadastroForm/>}/>
-        <Route path={`${CHAT_ROUTE}:roomName`} element={<Chat />} />
-
         <Route path="/comunidade" element={<Communities />} />
         <Route path="/comunidade/:id" element={<CommunityDetails />} />
         <Route path="/search" element={<SearchResults />} />

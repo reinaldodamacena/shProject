@@ -1,18 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { connectToChat } from '../Api';
 import { CHAT_ROUTE } from '../apiRoutes';
-import { useLocation } from 'react-router-dom';
-import { ChatContainer, MessageList, Message, Input, SendButton } from './ChatStyle';
-import SendIcon from '@mui/icons-material/Send';
+import { useHistory } from 'react-router-dom';
 
-const Chat = () => {
+
+
+const Chat = ({ activeChat }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const socketRef = useRef(null);
-  const location = useLocation();
-  const roomName = location?.state?.name || null;
-  const senderId = location?.state?.senderId || null;
-  const receiverId = location?.state?.receiverId || null;
+  const roomName = activeChat?.name || null;
+  const senderId = activeChat?.senderId || null;
+  const receiverId = activeChat?.receiverId || null;
   const token = localStorage.getItem('authToken');
 
   const onMessageReceivedRef = useRef();
@@ -81,28 +80,26 @@ const Chat = () => {
 
   
   return (
-    <ChatContainer>
-      <h1>Chat: {roomName}</h1>
-      <MessageList>
-        {messages.map((message, index) => (
-          <Message key={index}>
-            <strong>{message.sender_first_name}: </strong>
-            {message.content}
-          </Message>
-        ))}
-      </MessageList>
-      <div>
-        <Input
-          value={inputValue}
-          onChange={(event) => setInputValue(event.target.value)}
-        />
-        <SendButton onClick={handleSendMessage} startIcon={<SendIcon />}>
-          Enviar
-        </SendButton>
+        <div className="chat-container">
+        <h1 className="chat-header">Chat: {roomName}</h1>
+        <div className="message-list">
+          {messages.map((message, index) => (
+            <p key={index}>
+              <strong>{message.sender_first_name}: </strong>
+              {message.content}
+            </p>
+          ))}
+        </div>
+        <div className="message-input">
+          <input 
+            value={inputValue}
+            onChange={(event) => setInputValue(event.target.value)}
+          />
+          <button onClick={handleSendMessage}>
+            Enviar
+          </button>
+        </div>
       </div>
-    </ChatContainer>
-
-
   );
 };
 

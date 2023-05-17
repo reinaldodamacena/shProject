@@ -14,6 +14,7 @@ import Badge from '@mui/material/Badge';
 
 
 
+
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
     backgroundColor: '#44b700',
@@ -43,11 +44,12 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
-const FriendList = () => {
+const FriendList = ({ setActiveChat }) => {
   const [connections, setConnections] = useState([]);
   const [profileData, setProfileData] = useState(null);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
+  
 
   useEffect(() => {
     const fetchConnections = async () => {
@@ -92,13 +94,12 @@ const FriendList = () => {
     if (senderId && receiverId && token) {
       const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const formattedRoomName = [senderId, receiverId].sort().join('_');
-      let wsURL = `${wsScheme}//${window.location.hostname}:8000${CHAT_ROUTE}${formattedRoomName}/`;
+      // let wsURL = `${wsScheme}//${window.location.hostname}:8000${CHAT_ROUTE}${formattedRoomName}/`;
       connectToChat(formattedRoomName, senderId, receiverId, token, onMessageReceived);
     
       console.log('Connection established:', formattedRoomName);
     
-      // navigate to the chat route
-      navigate(`ws/chat/${formattedRoomName}`, { state: { name: formattedRoomName, senderId, receiverId } });
+      setActiveChat({ name: formattedRoomName, senderId, receiverId });
     }
   };
 
