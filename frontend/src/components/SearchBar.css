@@ -1,0 +1,6 @@
+.search-bar{
+    width: 300px;
+}
+.search-bar > *:not(.search-bar){
+    width: 100%;
+}

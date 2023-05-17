@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { LOGIN_ROUTE, POSTS_ROUTE, FEED_USER_ROUTE, PROFILE_ROUTE } from './apiRoutes';
+import { API_BASE_URL,LOGIN_ROUTE, POSTS_ROUTE, FEED_USER_ROUTE, PROFILE_ROUTE, PROFILE_CONN, CHAT_ROUTE } from './apiRoutes';
 
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000', // Altere a URL base da sua API conforme necessário
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -84,3 +84,43 @@ export const getProfileData = async (authToken) => {
     throw new Error('Erro ao obter as informações do perfil: ' + error.message);
   }
 };
+
+export const getConnectedProfiles = async () => {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const response = await api.get(PROFILE_CONN, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw new Error('Erro ao obter perfis conectados: ' + error.message);
+  }
+};
+
+
+export const connectToChat = (roomName, senderId, receiverId, token, onMessageReceived) => {
+  console.log('Inside connectToChat, onMessageReceived is:', onMessageReceived);
+  console.log('Type of onMessageReceived:', typeof onMessageReceived);
+  
+  const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const wsURL = `${wsScheme}//${window.location.hostname}:8000/ws/chat/${roomName}/${senderId}/${receiverId}/?token=${token}`;
+  console.log('Connecting to WebSocket at URL:', wsURL);
+  const socket = new WebSocket(wsURL);
+
+  socket.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      console.log('Inside onmessage, onMessageReceived is:', onMessageReceived);
+      console.log('Type of onMessageReceived:', typeof onMessageReceived);
+      onMessageReceived(data);
+    } catch (error) {
+      console.error('Failed to parse message data:', event.data, 'Error:', error);
+    }
+  }
+
+  return socket;
+};
+

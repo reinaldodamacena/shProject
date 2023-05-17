@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Post from './Post';
 import { getFeedData } from '../Api';
 
@@ -28,7 +28,8 @@ const Feed = () => {
         return (
           <Post
             key={post.id}
-            user={post.profile.user}
+            user={post.user}
+            profile={post.profile}
             content={post.content}
             image={post.image}
             timestamp={post.timestamp}

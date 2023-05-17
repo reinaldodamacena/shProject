@@ -11,13 +11,22 @@
 .left-sidebar{
     position: fixed;
     justify-self: start;
+    margin: 20px;
 }
 .right-sidebar{
     position: fixed;
     justify-self: end;
+    margin: 20px;
 }
 .center-content{
     position: absolute;
     justify-self: center;
-    max-width: 30%;
+    width: 40%;
+}
+.global-logo > img{
+    width: 80px;
+}
+.global-logo{
+    color: #5C95E3;
+    display: flex;
 }

@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import Button from '@mui/material/Button';
 import { getProfileData } from '../Api';
+import './ProfileSection.css';
+import FriendList from './FriendList';
 
 const ProfileSection = () => {
   const [profileData, setProfileData] = useState({});
@@ -24,22 +27,33 @@ const ProfileSection = () => {
     return <div>Carregando...</div>;
   }
 
-  const { background_image, avatar, user, connections } = profileData;
+  const { id,background_image, avatar, user, bio, connections } = profileData;
 
   return (
+    
     <section className="profile-section">
+      
       {/* Imagem de fundo */}
-      <img src={background_image} alt="Imagem de fundo" className="bg-profile"/>
-      {/* Imagem de perfil */}
-      <img src={avatar} alt="Imagem de perfil" className="img-profile" />
+      <div className="content-profile">
+        <img src={background_image} alt="Imagem de fundo" className="bg-profile"/>
+        {/* Imagem de perfil */}
+        <img src={avatar} alt="Imagem de perfil" className="img-profile" />
+      </div>
       {/* Nome de usuário */}
-      <div>Nome de usuário: {user?.username}</div> 
+      <div className='personal-profile-info'>
+        <h3>{user?.username}</h3> 
+        <p>{bio}</p> 
+      </div>
       {/* Número de conexões */}
-      <div>Número de conexões: {connections ? connections.length: 0}</div>
-      {/* Opção para ir até as publicações */}
-      <button>Ir até as publicações</button>
-      {/* Opção para ir até os vídeos */}
-      <button>Ir até os vídeos</button>
+      <div className='connections'>
+        <h4>{connections ? connections.length: 0}</h4>
+        <p>Conexões</p>
+      </div>
+
+      <div className='profile-buttons'>
+        <Button variant="outlined">Publicações</Button>
+        <Button variant="outlined">Vídeos</Button>
+      </div>
     </section>
   );
 };
