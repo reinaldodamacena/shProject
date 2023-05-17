@@ -13,6 +13,8 @@ import './Home.css';
 function Home() {
   const [refreshFeed, setRefreshFeed] = useState(false);
   const [showCommunities, setShowCommunities] = useState(false);
+  const [activeChat, setActiveChat] = useState(null);
+
 
   useEffect(() => {
     // Verifica se o usuário está autenticado (exemplo: verificando se há um token válido)
@@ -53,8 +55,8 @@ function Home() {
         </div>
         <div className="right-sidebar">
           <SearchBar />
-          <FriendList />
-          <Chat />
+          <FriendList setActiveChat={setActiveChat} />
+          {activeChat && <Chat activeChat={activeChat} />}
         </div>
       </div>
     </div>
