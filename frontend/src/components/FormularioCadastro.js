@@ -17,14 +17,17 @@ function CadastroForm() {
       <h1 className='formularioText'>Formulário</h1>
       <h2 className='textLogo'>ConnectHeroes</h2>
       <form className="register" onSubmit={handleSubmit}>
-      <label>
-       First name: 
-        <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-      </label>
-      <label>
-        Last name: 
-        <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
-      </label>
+        <div className='nomeUsuario'>
+          <label className='user-input'>
+            First name: 
+            <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+          </label>
+          <label className='user-input'>
+            Last name: 
+            <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+          </label>
+        </div>
+      
       <label>
         E-mail:
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
