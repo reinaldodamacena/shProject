@@ -8,10 +8,13 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from .forms import PostForm
+from rest_framework import viewsets
 from .models import Profile, Community, Post, Feed, Message, Profile, Like
 from rest_framework import generics, permissions, status
 from .serializers import ProfileSerializer, CommunitySerializer, PostSerializer, MessageSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly, BasePermission
+from rest_framework.decorators import action
+
 
 
 
@@ -150,10 +153,35 @@ class IsParticipant(BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user in obj.participants.all()
 
-class MessageDetail(generics.RetrieveAPIView):
-    queryset = Message.objects.all()
+
+class IsConnectedProfileParticipant(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        connected_profile = obj.connected_profile
+        return connected_profile in user.profile.connections.all()
+
+
+class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
-    permission_classes = [IsAuthenticated, IsParticipant]
+    permission_classes = [permissions.IsAuthenticated, IsConnectedProfileParticipant]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Message.objects.filter(models.Q(sender=user) | models.Q(receiver=user))
+
+    def perform_create(self, serializer):
+        serializer.save(sender=self.request.user)
+
+    @action(detail=True, methods=['get'])
+    def chat_history(self, request, pk=None):
+        other_user_id = request.GET.get('user_id')
+        messages = Message.objects.filter(
+            models.Q(sender_id=request.user.id, receiver_id=other_user_id) |
+            models.Q(sender_id=other_user_id, receiver_id=request.user.id)
+        ).order_by('created_at')
+        serializer = MessageSerializer(messages, many=True)
+        return Response(serializer.data)
+
 
 class FeedUser(generics.ListCreateAPIView):
     serializer_class = PostSerializer

@@ -1,0 +1,32 @@
+.create-post-section{
+    border: 3px solid #5C95E3;
+    border-radius: 15px;
+    width: 100%;
+    padding: 20px;
+    margin-top: 20px;
+}
+.file-input-container {
+    position: relative;
+    display: grid;
+}
+
+.insertion-icon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.file-input {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+}
+.options{
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    margin-top: 5px;
+}
+.options > *:not(.options){
+    margin-left: 10px;
+}

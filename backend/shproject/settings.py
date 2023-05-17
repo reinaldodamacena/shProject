@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'debug_toolbar',
+    'corsheaders',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -53,13 +55,14 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = [
-    'http://127.0.0.1:8000',
-    'http://localhost:3000'
+    
+    'http://localhost:3000',
 ]
 
 ROOT_URLCONF = 'shproject.urls'
@@ -79,6 +82,8 @@ TEMPLATES = [
         },
     },
 ]
+
+ASGI_APPLICATION = 'shproject.asgi.application'
 
 WSGI_APPLICATION = 'shproject.wsgi.application'
 
@@ -154,4 +159,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ),
+}
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
 }

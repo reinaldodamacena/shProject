@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Profile, Community, Post, Message, Comment, CommentLike, Like
 from django.contrib.auth.models import User
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -12,12 +13,21 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'first_name', 'last_name')
 
-class ProfileSerializer(serializers.ModelSerializer):
+class ConnectionSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer(read_only=True)
 
     class Meta:
         model = Profile
-        fields = ['user', 'bio', 'avatar', 'connections', 'background_image']
+        fields = ['id', 'user', 'bio', 'avatar']
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = CustomUserSerializer(read_only=True)
+    connections = ConnectionSerializer(many=True)
+
+    class Meta:
+        model = Profile
+        fields = ['id', 'user', 'bio', 'avatar', 'connections', 'background_image']
+
 
 class CommunitySerializer(serializers.ModelSerializer):
     members = UserSerializer(many=True, read_only=True)
@@ -60,9 +70,6 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    sender = UserSerializer(read_only=True)
-    receiver = UserSerializer(read_only=True)
-
     class Meta:
         model = Message
-        fields = ('id','sender','receiver', 'content', 'created_at')
+        fields = '__all__'

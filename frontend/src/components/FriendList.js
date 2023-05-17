@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { getConnectedProfiles } from '../Api';
+import { useNavigate } from 'react-router-dom';
+import { getConnectedProfiles, connectToChat, getProfileData } from '../Api';
+import { API_BASE_URL, CHAT_ROUTE } from '../apiRoutes';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import IconButton from '@mui/material/IconButton';
@@ -9,6 +11,8 @@ import Avatar from '@mui/material/Avatar';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { styled } from '@mui/material/styles';
 import Badge from '@mui/material/Badge';
+
+
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -41,46 +45,92 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 
 const FriendList = () => {
   const [connections, setConnections] = useState([]);
+  const [profileData, setProfileData] = useState(null);
+  const navigate = useNavigate();
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     const fetchConnections = async () => {
       try {
         const data = await getConnectedProfiles();
         setConnections(data);
+        console.log('profileData:', data);
       } catch (error) {
         console.error('Erro ao obter as conexões:', error);
       }
     };
 
+    const fetchProfileData = async () => {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        console.log('authToken:', authToken);
+        const data = await getProfileData(authToken);
+        console.log('profileData:', data);
+        setProfileData(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    
     fetchConnections();
+    fetchProfileData();
   }, []);
+  const onMessageReceived = (message) => {
+    console.log('Received message:', message);
+    setMessages((prevMessages) => [...prevMessages, message]);
+  };
+
+  const handleConnectToChat = (connection) => {
+    const senderId = profileData ? profileData.id : null; // ID do usuário logado
+    const receiverId = connection.id; // ID da conexão
+    const token = localStorage.getItem('authToken'); // Recupere o token aqui
+
+    console.log('senderId:', senderId);
+    console.log('receiverId:', receiverId);
+    console.log('token:',token);
+
+    if (senderId && receiverId && token) {
+      const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const formattedRoomName = [senderId, receiverId].sort().join('_');
+      let wsURL = `${wsScheme}//${window.location.hostname}:8000${CHAT_ROUTE}${formattedRoomName}/`;
+      connectToChat(formattedRoomName, senderId, receiverId, token, onMessageReceived);
+    
+      console.log('Connection established:', formattedRoomName);
+    
+      // navigate to the chat route
+      navigate(`ws/chat/${formattedRoomName}`, { state: { name: formattedRoomName, senderId, receiverId } });
+    }
+  };
+
 
   return (
     <div className="friend-list">
-        <List>{connections.map(connection =>(
-          <ListItem secondaryAction={
-            <IconButton edge="end" aria-label="message">
-              <ChatBubbleOutlineIcon />
-            </IconButton>
-          }>
-            <ListItemAvatar>
-              <StyledBadge
-                overlap="circular"
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                variant="dot"
+      <List>
+          {connections.map(connection =>(
+       <ListItem key={connection.id} secondaryAction={
+        <IconButton edge="end" aria-label="mensagem" onClick={() => handleConnectToChat(connection)}>
+            <ChatBubbleOutlineIcon />
+        </IconButton>
+      }>
+      
+              <ListItemAvatar>
+                <StyledBadge
+                  overlap="circular"
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                  variant="dot"
                 >
-                <Avatar alt={connection.user.username} src={''}/>  
-              </StyledBadge>  
-            </ListItemAvatar>
-            <ListItemText
-              primary = {connection.user.first_name}
-            />
-          </ListItem>
-        ))}            
+                  <Avatar alt={connection.user.username} src={''}/>  
+                </StyledBadge>  
+              </ListItemAvatar>
+              <ListItemText
+                primary={connection.user.first_name}
+              />
+            </ListItem>
+            
+          ))}
         </List>
     </div>
   );
 };
 
 export default FriendList;
-

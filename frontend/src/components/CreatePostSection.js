@@ -57,9 +57,11 @@ const CreatePostSection = ({ onPostCreated }) => {
             <img src={InsertionMediaIcon} alt="Inserção de Mídia" className="insertion-icon" onClick={handleIconClick} />
             <input type="file" id="file-input" className="file-input" onChange={(e) => setFile(e.target.files[0])} />
           </div>
-          <img src={InsertionLocalizationIcon} alt="Inserção de Mídia" className="insertion-icon" onClick={console.log('foi')}/>
+          <img src={InsertionLocalizationIcon} alt="Inserção de Localização" className="insertion-icon" onClick={() => console.log('foi')} />
           {/* Botão de publicar */}
-          <Button variant="contained" type="submit" sx={{ backgroundColor: '#5C95E3' }}>Publicar</Button>
+          <Button variant="contained" type="submit" sx={{ backgroundColor: '#5C95E3' }}>
+            Publicar
+          </Button>
         </div>
       </form>
     </section>
