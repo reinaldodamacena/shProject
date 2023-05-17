@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { createPost } from '../Api';
+import { createPostCommunity } from '../Api';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import InsertionMediaIcon from '../icons/media.svg';
 import InsertionLocalizationIcon from '../icons/localization.svg';
 import './CreatePostSection.css';
 
-const CreatePostSection = ({ onPostCreated }) => {
+const CreateCommunityPostSection = ({ id, onPostCreated }) => {
   const [content, setContent] = useState('');
   const [image, setImage] = useState(null);
 
@@ -21,7 +21,7 @@ const CreatePostSection = ({ onPostCreated }) => {
     }
 
     try {
-      await createPost(formData);
+      await createPostCommunity(formData, id); // Usando `id` ao invés de `communityId`
       console.log('Publicação criada com sucesso!');
       setContent('');
       setImage(null);
@@ -68,4 +68,4 @@ const CreatePostSection = ({ onPostCreated }) => {
   );
 };
 
-export default CreatePostSection;
+export default CreateCommunityPostSection;

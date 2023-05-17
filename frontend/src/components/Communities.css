@@ -1,0 +1,47 @@
+/* Communities.css */
+.community{
+    border: 3px solid #5C95E2;
+    border-radius: 30px;
+    padding: 20px;
+    width: 100%;
+    margin-top: 30px;
+}
+.communities-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.page-buttons {
+    margin: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #008CBA; /* Altere para qualquer cor que você preferir */
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.page-buttons:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.page-buttons:hover:not(:disabled) {
+    background-color: #007B9A; /* Uma tonalidade mais escura do que a cor do botão */
+}
+
+.page-buttons:active:not(:disabled) {
+    background-color: #005F72; /* Uma tonalidade ainda mais escura */
+}
+
+.community-card {
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px;
+    width: 80%;  /* Ajuste para o que melhor se adequar ao seu layout */
+}
