@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
@@ -232,3 +233,25 @@ class LikePost(generics.RetrieveAPIView):
         post_id = self.kwargs.get('post_id')
         post = get_object_or_404(Post, id=post_id)
         return post
+
+@csrf_exempt
+def create_user(request):
+    if request.method == 'POST':
+        # Obtenha os dados do corpo da requisição
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        email = request.POST.get('email')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+
+        # Verifique se o usuário já existe
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({'error': 'Username already exists'})
+
+        # Crie um novo usuário
+        user = User.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name)
+
+        # Retorne a resposta adequada, por exemplo, um JSON com os dados do usuário criado
+        return JsonResponse({'message': 'User created successfully', 'user': {'username': user.username, 'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name}})
+    else:
+        return JsonResponse({'error': 'Invalid request method'})
