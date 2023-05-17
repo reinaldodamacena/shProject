@@ -109,8 +109,6 @@ export const connectToChat = (roomName, senderId, receiverId, token, onMessageRe
   const wsURL = `${wsScheme}//${window.location.hostname}:8000/ws/chat/${roomName}/${senderId}/${receiverId}/?token=${token}`;
   console.log('Connecting to WebSocket at URL:', wsURL);
   const socket = new WebSocket(wsURL);
-  return socket;
-};
 
   socket.onmessage = (event) => {
     try {
@@ -122,6 +120,10 @@ export const connectToChat = (roomName, senderId, receiverId, token, onMessageRe
       console.error('Failed to parse message data:', event.data, 'Error:', error);
     }
   }
+
+  return socket;
+};
+
 export const getCommunitiesOfLoggedInUser = async () => {
   try {
     const authToken = localStorage.getItem('authToken');
@@ -172,5 +174,11 @@ export const createPostCommunity = async (formData, id) => {
   }
 };
 
+export const searchCommunityByName = async()=>{
+  return
+};
 
-
+export const getCommunityPosts = async () =>
+{
+  return
+};
