@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework import routers
-from backShProject.views import (profile, community, post, create_post, feed, chat, search, home, ProfileList, ProfileDetail, CommunityList, CommunityDetail, PostList, PostDetail, MessageList, MessageViewSet, FeedUser, CustomAuthToken, LikePost, ConnectedProfileList)
+from backShProject.views import (profile, community, post, create_post, feed, chat, search, home, ProfileList, ProfileDetail, CommunityList, CommunityDetail, PostList, PostDetail, MessageList, MessageViewSet, FeedUser, CustomAuthToken, LikePost, ConnectedProfileList, create_user)
 from .consumers.consumidores import ChatConsumer
 from .consumers.routing import websocket_urlpatterns
 
@@ -52,6 +52,7 @@ urlpatterns = [
     path('ws/chat/<str:room_name>/', ChatConsumer.as_asgi()),
     path('ws/chat/<int:sender_id>/<int:receiver_id>/', ChatConsumer.as_asgi()),
     path('ws/', include(websocket_urlpatterns)),
+    path('create_user/', create_user),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
