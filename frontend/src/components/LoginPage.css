@@ -1,0 +1,90 @@
+@font-face {
+    font-family: "fontlogoConnect";
+    src: url("../assets/fonts/Kalam/Kalam-Bold.ttf") format("ttf"),
+      url("../assets/fonts/Kalam/Kalam-Regular.ttf") format("tff");
+    font-weight: bold;
+    font-style: normal;
+  }
+  .login {
+    margin-top: 80px;
+    margin-left: 35%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+   
+    width: 500px;
+    height: 650px;
+    background-color: #f1f1f1;
+    border-radius: 8px;
+    box-shadow: 2px 4px 8px #a39797;
+  }
+  
+ .loginText, .logoText{
+    font-family:'Kalam', cursive;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: bold;
+    background-image: linear-gradient(to top,#bf4bb9, #984594 ,#475bb5,#536cdb );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-fill-color: transparent;
+  }
+  
+  
+  
+  .image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  
+  img {
+    width: 10rem;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .labelUserName, .labelPassword {
+    display:flex;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    width: 400px;
+    justify-content: space-between;
+    
+    
+  }
+  
+  input[type="text"],
+  input[type="password"] {
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    margin-left:5px;
+    margin-bottom: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+  }
+  
+  button {
+    font-size: 1.5rem;
+    padding: 0.5rem 2rem;
+    background-color: #5C95E3;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  button:hover {
+    background-color: #224b85;
+  }
+  
