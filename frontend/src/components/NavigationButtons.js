@@ -1,4 +1,6 @@
 import React from 'react';
+import Button from '@mui/material/Button';
+import './NavigationButtons.css'
 
 const NavigationButtons = () => {
   const handleLogout = () => {
@@ -12,11 +14,11 @@ const NavigationButtons = () => {
   return (
     <nav className="navigation-buttons">
       {/* Botão Conexões */}
-      <button>Conexões</button>
+      <Button variant="outlined">Conexões</Button>
       {/* Botão Comunidade */}
-      <button>Comunidade</button>
+      <Button variant="outlined">Comunidade</Button>
       {/* Botão Sair */}
-      <button onClick={handleLogout}>Sair</button>
+      <Button variant="outlined" onClick={handleLogout}>Sair</Button>
     </nav>
   );
 };

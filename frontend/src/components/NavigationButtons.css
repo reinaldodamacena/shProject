@@ -1,0 +1,6 @@
+.navigation-buttons{
+    display: grid;
+}
+.navigation-buttons > *:not(.navigation-buttons){
+    margin: 5px;
+}
