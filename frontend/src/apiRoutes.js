@@ -5,5 +5,9 @@ export const POSTS_ROUTE = '/posts/';
 export const FEED_USER_ROUTE = '/FeedUser/';
 export const PROFILE_ROUTE = '/profile/'
 export const PROFILE_CONN = '/connected-profiles/'
+export const COMMUNITY_ROUTE = '/communities/';
+export const USER_COMMUNITIES_ROUTE = '/user/communities/';
+
+
 export const MESSAGE_LIST_URL = `${API_BASE_URL}/messages/`;
 export const CHAT_ROUTE = '/ws/chat/';

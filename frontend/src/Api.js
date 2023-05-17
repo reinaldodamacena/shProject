@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_BASE_URL,LOGIN_ROUTE, POSTS_ROUTE, FEED_USER_ROUTE, PROFILE_ROUTE, PROFILE_CONN, CHAT_ROUTE } from './apiRoutes';
+import { API_BASE_URL,LOGIN_ROUTE, POSTS_ROUTE, FEED_USER_ROUTE, PROFILE_ROUTE, PROFILE_CONN, CHAT_ROUTE,COMMUNITY_ROUTE} from './apiRoutes';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -124,3 +124,61 @@ export const connectToChat = (roomName, senderId, receiverId, token, onMessageRe
   return socket;
 };
 
+export const getCommunitiesOfLoggedInUser = async () => {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const response = await api.get(COMMUNITY_ROUTE, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw new Error('Erro ao obter comunidades do usuário logado: ' + error.message);
+  }
+};
+
+export const getCommunityDetails = async (id) => {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const response = await api.get(`${COMMUNITY_ROUTE}${id}/`, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw new Error('Erro ao obter detalhes da comunidade: ' + error.message);
+  }
+};
+
+export const createPostCommunity = async (formData, id) => {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const response = await api.post(`${COMMUNITY_ROUTE}${id}/posts/`, formData, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    if (response.status === 201) {
+      return response.data;
+    } else {
+      throw new Error('Erro ao criar a publicação na comunidade');
+    }
+  } catch (error) {
+    throw new Error('Erro ao criar a publicação na comunidade: ' + error.message);
+  }
+};
+
+export const searchCommunityByName = async()=>{
+  return
+};
+
+export const getCommunityPosts = async () =>
+{
+  return
+};
