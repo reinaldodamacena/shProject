@@ -41,7 +41,7 @@ const ProfileSection = () => {
       </div>
       {/* Nome de usuário */}
       <div className='personal-profile-info'>
-        <h3>{user?.username}</h3> 
+        <h3>{user?.first_name}</h3> 
         <p>{bio}</p> 
       </div>
       {/* Número de conexões */}

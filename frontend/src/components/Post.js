@@ -8,7 +8,7 @@ import InsertionSendIcon from '../icons/send.svg';
 import './Post.css'
 
 
-const Post = ({ user, profile, content, image, timestamp, likes, postId }) => {
+const Post = ({ user, profile, content, file, timestamp, likes, postId }) => {
   const [postLikes, setPostLikes] = useState([]);
   const [liked, setLiked] = useState(false);
   useEffect(() => {
@@ -68,7 +68,7 @@ const Post = ({ user, profile, content, image, timestamp, likes, postId }) => {
         {console.log(profile.user)}
         <Avatar alt={profile.user.username} src={profile.avatar} sx={{ width: 56, height: 56 }}/>
         <div className="post-info">
-        <h3 className="post-author">{profile.user.username}</h3>
+        <h3 className="post-author">{profile.user.first_name}</h3>
         <p className="post-data">{new Date(timestamp).toLocaleDateString('pt-BR', {
         day: 'numeric', 
         month: 'long', 
@@ -77,7 +77,18 @@ const Post = ({ user, profile, content, image, timestamp, likes, postId }) => {
       </div>
       <p className="post-content">{content}</p>
 
-      {image && <img className="post-img" src={image} alt="Post Image" />}
+      {file && (
+        <div className="post-media">
+          {file.endsWith('.mp4') ? (
+            <video className="post-video" controls controlsList="nodownload">
+              <source src={file} type="video/mp4" />
+              Seu navegador não suporta reprodução de vídeo.
+            </video>
+          ) : (
+            <img className="post-img" src={file} alt="Post Image" />
+          )}
+        </div>
+      )}
 
       {/* Opções "curtir", "comentar" e "compartilhar" */}
       <div className="b-opitions">
