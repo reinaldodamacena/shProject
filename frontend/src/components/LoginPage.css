@@ -12,6 +12,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+   
     width: 500px;
     height: 650px;
     background-color: #f1f1f1;
@@ -19,12 +20,13 @@
     box-shadow: 2px 4px 8px #a39797;
   }
   
-  h1, h2{
+ .loginText, .logoText{
     font-family:'Kalam', cursive;
     font-size: 2.5rem;
     margin-bottom: 1rem;
+    text-align: center;
     font-weight: bold;
-    background-image: linear-gradient(to top,#9c1e96 ,#4a349a );
+    background-image: linear-gradient(to top,#bf4bb9, #984594 ,#475bb5,#536cdb );
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -50,15 +52,21 @@
     align-items: center;
   }
   
-  label {
+  .labelUserName, .labelPassword {
+    display:flex;
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
+    width: 400px;
+    justify-content: space-between;
+    
+    
   }
   
   input[type="text"],
   input[type="password"] {
     font-size: 1.5rem;
     padding: 0.5rem;
+    margin-left:5px;
     margin-bottom: 1rem;
     border: none;
     border-radius: 0.5rem;
