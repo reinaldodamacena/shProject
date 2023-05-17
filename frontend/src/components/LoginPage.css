@@ -42,9 +42,7 @@
     overflow: hidden;
   }
   
-  img {
-    width: 10rem;
-  }
+  
   
   form {
     display: flex;
