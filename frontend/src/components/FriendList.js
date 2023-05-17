@@ -123,7 +123,7 @@ const FriendList = () => {
                 </StyledBadge>  
               </ListItemAvatar>
               <ListItemText
-                primary={connection.user.username}
+                primary={connection.user.first_name}
               />
             </ListItem>
             

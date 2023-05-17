@@ -66,7 +66,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('id', 'user', 'profile', 'content', 'image', 'timestamp', 'likes', 'comments')
+        fields = ('id', 'user', 'profile', 'content', 'file', 'timestamp', 'likes', 'comments')
 
 
 class MessageSerializer(serializers.ModelSerializer):
