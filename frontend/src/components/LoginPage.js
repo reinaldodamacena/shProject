@@ -49,7 +49,7 @@ const LoginPage = () => {
   return (
     <div clssName="login">
       <h1 className='loginText'>Login</h1>
-      <div className='image'>
+      <div className='imagem'>
         <img src={Image}/>
       </div>
       <h2 className='logoText'>ConnectHeroes</h2>

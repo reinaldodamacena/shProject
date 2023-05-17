@@ -32,16 +32,23 @@
     -webkit-text-fill-color: transparent;
     text-fill-color: transparent;
   }
+   .logoText{
+    margin-top: 0;
+   }
   
   
-  
-  .image {
+  .imagem {
+    
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
   }
   
+  .imagem > img{
+    width: 165.99px;
+    height: 122px;
+  }
   
   
   form {
