@@ -10,3 +10,4 @@ six==1.16.0
 sqlparse==0.4.4
 tzdata==2023.3
 channels==3.0.4
+pyfcm==1.5.4

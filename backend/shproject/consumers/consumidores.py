@@ -8,6 +8,7 @@ from asgiref.sync import sync_to_async
 from .permissions import IsConnectedProfileParticipant
 from backShProject.models import Message, Profile
 from django.db.models import Q
+from pyfcm import FCMNotification
 import json
 import asyncio
 
@@ -63,6 +64,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Split room name into sender and receiver IDs
         sender_id, receiver_id = map(int, self.room_name.split('_'))
 
+        # Set user as online
+        await self.set_user_online(sender_id, True)
+
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -83,16 +87,32 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
 
     async def disconnect(self, close_code):
+    # Set user as offline
+        await self.set_user_online(self.scope['user'].id, False)
+
         # Leave room group
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
+    )
+    def send_push_notification(self, receiver, message):
+        push_service = FCMNotification(api_key="<NGR0IHWKlH2mBaZ7oBvsNQDO1pKsqoWpA_ooGNg8u90>")
+
+        
+        registration_id = receiver.profile.fcm_token
+
+        result = push_service.notify_single_device(
+            registration_id=registration_id, 
+            message_title="New Message", 
+            message_body=message
         )
+
+        return result
     
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
+        message_content = text_data_json['message']
         receiver_id = text_data_json['receiver_id']
 
         receiver = await self.get_user(receiver_id)
@@ -104,7 +124,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return sender_profile in connected_profile
 
         if await asyncio.to_thread(check_sender_profile):
-            message = await self.save_message(sender, receiver, message)
+            message = await self.save_message(sender, receiver, message_content)
             response = {
                 'mensagem': 'Mensagem Envida',
                 'content': message['content'],  # Altere isto
@@ -128,7 +148,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
 
         # Save message to database
-        message = await self.create_message(sender, receiver, message)
+        message = await self.create_message(sender, receiver, message_content)
+
+        if not await self.is_user_online(receiver_id):
+            self.send_push_notification(receiver, message_content)
 
         # Send message to room group
         await self.channel_layer.group_send(
@@ -220,3 +243,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         except ObjectDoesNotExist:
             # Trate aqui o caso em que o objeto não existe
             return None
+    @database_sync_to_async
+    def set_user_online(self, user_id, is_online):
+        user = User.objects.get(pk=user_id)
+        user.is_online = is_online
+        user.save()
+    
+    @database_sync_to_async
+    def is_user_online(self, user_id):
+        user = User.objects.get(pk=user_id)
+        return user.is_online

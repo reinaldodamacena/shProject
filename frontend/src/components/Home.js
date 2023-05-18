@@ -56,7 +56,7 @@ function Home() {
         <div className="right-sidebar">
           <SearchBar />
           <FriendList setActiveChat={setActiveChat} />
-          {activeChat && <Chat activeChat={activeChat} />}
+          {activeChat && <Chat activeChat={activeChat} setActiveChat={setActiveChat} />}
         </div>
       </div>
     </div>

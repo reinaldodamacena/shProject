@@ -9,9 +9,11 @@ class Profile(models.Model):
     avatar = models.ImageField(upload_to='avatars/', default='default-avatar.png')
     connections = models.ManyToManyField('self', blank=True)
     background_image = models.ImageField(upload_to='backgrounds/', blank=True, null=True)
+    fcm_token = models.CharField(max_length=4096, blank=True, null=True)  # Linha nova
 
     def __str__(self):
         return f'{self.user.username}\'s profile'
+
 
 class Community(models.Model):
     name = models.CharField(max_length=100)

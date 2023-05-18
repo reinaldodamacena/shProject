@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { connectToChat } from '../Api';
 import { CHAT_ROUTE } from '../apiRoutes';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
 import { styled } from '@mui/material/styles';
@@ -16,7 +16,11 @@ import Input from '@mui/material/Input';
 import { IconButton } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from '@mui/icons-material/Close';
+import { initializeFirebaseMessaging, requestNotificationPermission, getToken } from '../Firebase';
+import firebase from 'firebase/app';
+import 'firebase/messaging';
 import './Chat.css'
+
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -47,7 +51,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
-const Chat = ({ activeChat }) => {
+const Chat = ({ activeChat, setActiveChat }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const socketRef = useRef(null);
@@ -58,6 +62,8 @@ const Chat = ({ activeChat }) => {
   const receiverName = activeChat?.receiver_first_name || null;
   const avatarSender = activeChat?.avatar_sender;
   const avatarReceiver = activeChat?.avatar_receiver;
+  const messaging = firebase.messaging();
+
 
   const onMessageReceivedRef = useRef();
   onMessageReceivedRef.current = (messageData) => {
@@ -104,6 +110,19 @@ const Chat = ({ activeChat }) => {
   };
 
   useEffect(() => {
+    initializeFirebaseMessaging();
+    const getTokenAndHandlePermission = async () => {
+      const permissionGranted = await requestNotificationPermission();
+      if (permissionGranted) {
+        const token = await messaging.getToken();
+        console.log('FCM token:', token);
+
+        // Envie o token para o servidor
+        sendTokenToServer(token);
+      }
+    };
+
+    getTokenAndHandlePermission();
     if (roomName && senderId && receiverId) {
       socketRef.current = connectToChat(roomName, senderId, receiverId, token, onMessageReceivedRef.current);
     }
@@ -130,6 +149,15 @@ const Chat = ({ activeChat }) => {
     }
   };
 
+  const closeChat = () => {
+    if (socketRef.current) {
+      socketRef.current.close();
+       
+    }
+    setActiveChat(null);
+    
+  };
+
   return (
     <Box className="chat-container">
       
@@ -143,7 +171,7 @@ const Chat = ({ activeChat }) => {
           <Avatar alt={receiverName} src={avatarReceiver} sx={{ width: 56, height: 56 }}/>  
         </StyledBadge> 
       {receiverName}</div>
-      <IconButton className='close-icon' color="background: #00000099;" onClick={handleSendMessage}>
+      <IconButton className='close-icon' color="background: #00000099;" onClick={closeChat}>
           <CloseIcon className='i-close' />
       </IconButton>
       </Typography>
