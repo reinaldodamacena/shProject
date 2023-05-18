@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../Api'; // Importe a função de login do arquivo Api.js
 import "./LoginPage.css";
+import Image from '../assets/images/image.png';
+
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -46,23 +48,25 @@ const LoginPage = () => {
 
   return (
     <div clssName="login">
-      <h1>Login</h1>
+      <h1 className='loginText'>Login</h1>
       <div className='image'>
-        <img src='../assets/images/image.png'/>
+        <img src={Image}/>
       </div>
-      <h2>ConnectHeroes</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
+      <h2 className='logoText'>ConnectHeroes</h2>
+      <form className='log-form' onSubmit={handleSubmit}>
+        <label className='labelUserName'>
           Username:
           <input type="text" value={username} onChange={handleUsernameChange} />
         </label>
         <br />
-        <label>
+        <label className='labelPassword'>
           Password:
           <input type="password" value={password} onChange={handlePasswordChange} />
         </label>
         <br />
         <button type="submit">Login</button>
+        <br/>
+        <Link to='/cadastro'>Cadastro</Link>
       </form>
     </div>
   );

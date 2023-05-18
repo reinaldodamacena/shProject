@@ -1,0 +1,85 @@
+/* Importando a fonte Kalam */
+@font-face {
+  font-family: "fontKalam";
+  src: url("../assets/fonts/Kalam/Kalam-Bold.ttf") format("ttf"),
+    url("../assets/fonts/Kalam/Kalam-Regular.ttf") format("tff");
+  font-weight: bold;
+  font-style: normal;
+}
+
+
+
+
+/* Estilo do formulário */
+.register form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 80%;
+}
+
+.register label :not(.user-input) {
+  width: 500px;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+.register input[type="text"],
+.register input[type="email"],
+.register input[type="password"] {
+  font-size: 1.5rem;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 500px;
+}
+
+.nomeUsuario{
+  max-width: 360px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.user-input{
+  width: 40%;
+
+}
+
+.formularioText, .textLogo{
+  font-family:'Kalam', cursive;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: bold;
+  background-image: linear-gradient(to top,#bf4bb9, #984594 ,#475bb5,#536cdb );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-fill-color: transparent;
+}
+
+/* Estilo das labels do formulário */
+
+/* Estilo dos inputs do formulário */
+
+
+/* Estilo do botão do formulário */
+.register button {
+  font-size: 1.5rem;
+  padding: 0.5rem 2rem;
+  background-color: #5c95e3;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 2rem;
+}
+
+.register button:hover {
+  background-color: #224b85;
+}

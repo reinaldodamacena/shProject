@@ -8,7 +8,7 @@ import InsertionSendIcon from '../icons/send.svg';
 import './Post.css'
 
 
-const Post = ({ user, profile, content, image, timestamp, likes, postId }) => {
+const Post = ({ user, profile, content, file, timestamp, likes, postId }) => {
   const [postLikes, setPostLikes] = useState([]);
   const [liked, setLiked] = useState(false);
   useEffect(() => {
@@ -38,22 +38,27 @@ const Post = ({ user, profile, content, image, timestamp, likes, postId }) => {
     try {
       const authToken = localStorage.getItem('authToken');
       const endpoint = `http://localhost:8000/posts/${postId}/like/`;
-
+  
+      const newLikedState = !liked; // Novo estado do liked
+  
+      // Atualiza o estado do liked imediatamente
+      setLiked(newLikedState);
+  
       const response = await axios.post(endpoint, null, {
         headers: {
           'Authorization': `Token ${authToken}`,
         },
       });
-
+  
       if (response.status === 200) {
+        // Atualize o estado postLikes, se necessário
         const newLike = { id: user.id };
-        if (!liked) {
+        if (newLikedState) {
           setPostLikes([...postLikes, newLike]);
         } else {
           const updatedLikes = postLikes.filter(like => like.id !== user.id);
           setPostLikes(updatedLikes);
         }
-        setLiked(!liked);
       } else {
         console.log('Erro ao adicionar/remover o like');
       }
@@ -68,7 +73,7 @@ const Post = ({ user, profile, content, image, timestamp, likes, postId }) => {
         {console.log(profile.user)}
         <Avatar alt={profile.user.username} src={profile.avatar} sx={{ width: 56, height: 56 }}/>
         <div className="post-info">
-        <h3 className="post-author">{profile.user.username}</h3>
+        <h3 className="post-author">{profile.user.first_name}</h3>
         <p className="post-data">{new Date(timestamp).toLocaleDateString('pt-BR', {
         day: 'numeric', 
         month: 'long', 
@@ -77,7 +82,18 @@ const Post = ({ user, profile, content, image, timestamp, likes, postId }) => {
       </div>
       <p className="post-content">{content}</p>
 
-      {image && <img className="post-img" src={image} alt="Post Image" />}
+      {file && (
+        <div className="post-media">
+          {file.endsWith('.mp4') ? (
+            <video className="post-video" controls controlsList="nodownload">
+              <source src={file} type="video/mp4" />
+              Seu navegador não suporta reprodução de vídeo.
+            </video>
+          ) : (
+            <img className="post-img" src={file} alt="Post Image" />
+          )}
+        </div>
+      )}
 
       {/* Opções "curtir", "comentar" e "compartilhar" */}
       <div className="b-opitions">

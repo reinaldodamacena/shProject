@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import { getProfileData } from '../Api';
-import './ProfileSection.css'
+import './ProfileSection.css';
+import FriendList from './FriendList';
 
 const ProfileSection = () => {
   const [profileData, setProfileData] = useState({});
@@ -26,10 +27,12 @@ const ProfileSection = () => {
     return <div>Carregando...</div>;
   }
 
-  const { background_image, avatar, user, bio, connections } = profileData;
+  const { id,background_image, avatar, user, bio, connections } = profileData;
 
   return (
+    
     <section className="profile-section">
+      
       {/* Imagem de fundo */}
       <div className="content-profile">
         <img src={background_image} alt="Imagem de fundo" className="bg-profile"/>
@@ -38,7 +41,7 @@ const ProfileSection = () => {
       </div>
       {/* Nome de usuário */}
       <div className='personal-profile-info'>
-        <h3>{user?.username}</h3> 
+        <h3>{user?.first_name}</h3> 
         <p>{bio}</p> 
       </div>
       {/* Número de conexões */}

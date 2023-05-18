@@ -1,5 +1,4 @@
 export const API_BASE_URL = 'http://127.0.0.1:8000'; 
-
 export const BASE_ROUTE = '/';
 export const LOGIN_ROUTE = '/api-token-auth/';
 export const POSTS_ROUTE = '/posts/';
@@ -9,3 +8,6 @@ export const PROFILE_CONN = '/connected-profiles/'
 export const COMMUNITY_ROUTE = '/communities/';
 export const USER_COMMUNITIES_ROUTE = '/user/communities/';
 
+
+export const MESSAGE_LIST_URL = `${API_BASE_URL}/messages/`;
+export const CHAT_ROUTE = '/ws/chat/';

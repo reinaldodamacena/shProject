@@ -2,15 +2,19 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from .forms import PostForm
+from rest_framework import viewsets
 from .models import Profile, Community, Post, Feed, Message, Profile, Like
 from rest_framework import generics, permissions, status
 from .serializers import ProfileSerializer, CommunitySerializer, PostSerializer, MessageSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly, BasePermission
+from rest_framework.decorators import action
+
 
 
 
@@ -149,10 +153,35 @@ class IsParticipant(BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user in obj.participants.all()
 
-class MessageDetail(generics.RetrieveAPIView):
-    queryset = Message.objects.all()
+
+class IsConnectedProfileParticipant(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        connected_profile = obj.connected_profile
+        return connected_profile in user.profile.connections.all()
+
+
+class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
-    permission_classes = [IsAuthenticated, IsParticipant]
+    permission_classes = [permissions.IsAuthenticated, IsConnectedProfileParticipant]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Message.objects.filter(models.Q(sender=user) | models.Q(receiver=user))
+
+    def perform_create(self, serializer):
+        serializer.save(sender=self.request.user)
+
+    @action(detail=True, methods=['get'])
+    def chat_history(self, request, pk=None):
+        other_user_id = request.GET.get('user_id')
+        messages = Message.objects.filter(
+            models.Q(sender_id=request.user.id, receiver_id=other_user_id) |
+            models.Q(sender_id=other_user_id, receiver_id=request.user.id)
+        ).order_by('created_at')
+        serializer = MessageSerializer(messages, many=True)
+        return Response(serializer.data)
+
 
 class FeedUser(generics.ListCreateAPIView):
     serializer_class = PostSerializer
@@ -185,22 +214,59 @@ class CustomAuthToken(ObtainAuthToken):
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key})
 
-class LikePost(generics.RetrieveAPIView):
+class LikePost(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
 
-    def retrieve(self, request, *args, **kwargs):
-        post = self.get_object()
-        user = request.user
+    def post(self, request, *args, **kwargs):
+        post_id = kwargs['post_id']
+        try:
+            post = Post.objects.get(id=post_id)
+            user = request.user
 
-        if user.is_authenticated:
-            liked = post.likes.filter(id=user.id).exists()
-            return Response({'liked': liked})
-        else:
-            return Response({'detail': 'Authentication credentials were not provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+            if user in post.likes.all():
+                post.likes.remove(user)
+                liked = False
+            else:
+                post.likes.add(user)
+                liked = True
 
-    def get_object(self):
-        post_id = self.kwargs.get('post_id')
-        post = get_object_or_404(Post, id=post_id)
-        return post
+            return self.list(request, *args, **kwargs)
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post not found'}, status=404)
+    
+    def get(self, request, *args, **kwargs):
+        post_id = kwargs['post_id']
+        try:
+            post = Post.objects.get(id=post_id)
+            user = request.user
+
+            if user in post.likes.all():
+                return JsonResponse({'liked': True})
+            else:
+                return JsonResponse({'liked': False})
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post not found'}, status=404)
+
+@csrf_exempt
+def create_user(request):
+    if request.method == 'POST':
+        # Obtenha os dados do corpo da requisição
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        email = request.POST.get('email')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+
+        # Verifique se o usuário já existe
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({'error': 'Username already exists'})
+
+        # Crie um novo usuário
+        user = User.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name)
+
+        # Retorne a resposta adequada, por exemplo, um JSON com os dados do usuário criado
+        return JsonResponse({'message': 'User created successfully', 'user': {'username': user.username, 'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name}})
+    else:
+        return JsonResponse({'error': 'Invalid request method'})

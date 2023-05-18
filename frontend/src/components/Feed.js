@@ -12,6 +12,7 @@ const Feed = () => {
         const data = await getFeedData();
         setFeedData(data);
         setUserId(data.user_id); // Definir o ID do usuário atual
+        console.log(data)
       } catch (error) {
         console.log(error);
       }
@@ -24,14 +25,13 @@ const Feed = () => {
     <div className="feed">
       {feedData.map(post => {
         const liked = post.likes.some(like => like.id === userId); // Verificar se o post foi curtido pelo usuário atual
-
         return (
           <Post
             key={post.id}
             user={post.user}
             profile={post.profile}
             content={post.content}
-            image={post.image}
+            file={post.file}
             timestamp={post.timestamp}
             likes={post.likes}
             comments={post.comments}

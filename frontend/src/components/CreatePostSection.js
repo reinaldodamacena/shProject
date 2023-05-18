@@ -8,7 +8,7 @@ import './CreatePostSection.css';
 
 const CreatePostSection = ({ onPostCreated }) => {
   const [content, setContent] = useState('');
-  const [image, setImage] = useState(null);
+  const [file, setFile] = useState(null);
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -16,15 +16,15 @@ const CreatePostSection = ({ onPostCreated }) => {
     const formData = new FormData();
     formData.append('content', content);
 
-    if (image) {
-      formData.append('image', image);
+    if (file) {
+      formData.append('file', file);
     }
 
     try {
       await createPost(formData);
       console.log('Publicação criada com sucesso!');
       setContent('');
-      setImage(null);
+      setFile(null);
       onPostCreated(); // Chamar a função para notificar que a publicação foi criada
     } catch (error) {
       console.error('Erro ao criar a publicação:', error);
@@ -55,7 +55,7 @@ const CreatePostSection = ({ onPostCreated }) => {
         <div className="options">
           <div className="file-input-container">
             <img src={InsertionMediaIcon} alt="Inserção de Mídia" className="insertion-icon" onClick={handleIconClick} />
-            <input type="file" id="file-input" className="file-input" onChange={(e) => setImage(e.target.files[0])} />
+            <input type="file" id="file-input" className="file-input" onChange={(e) => setFile(e.target.files[0])} />
           </div>
           <img src={InsertionLocalizationIcon} alt="Inserção de Localização" className="insertion-icon" onClick={() => console.log('foi')} />
           {/* Botão de publicar */}
