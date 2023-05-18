@@ -183,12 +183,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     def message_to_json(self, message):
         return {
+            'sender_id': message.sender.id,
             'sender': message.sender.username,
+            'receiver_id': message.receiver.id,
             'receiver': message.receiver.username,
             'content': message.content,
             'created_at': str(message.created_at),
             'sender_first_name': message.sender.first_name,  # incluir o nome do usuário aqui
         }
+
     @database_sync_to_async
     def get_chat_messages(self, event):
         sender_id = event['sender_id']
