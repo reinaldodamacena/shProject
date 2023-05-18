@@ -53,7 +53,7 @@ const LoginPage = () => {
         <img src={Image}/>
       </div>
       <h2 className='logoText'>ConnectHeroes</h2>
-      <form onSubmit={handleSubmit}>
+      <form className='log-form' onSubmit={handleSubmit}>
         <label className='labelUserName'>
           Username:
           <input type="text" value={username} onChange={handleUsernameChange} />

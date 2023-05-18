@@ -3,6 +3,8 @@ import { connectToChat } from '../Api';
 import { CHAT_ROUTE } from '../apiRoutes';
 import { useHistory } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
+import Badge from '@mui/material/Badge';
+import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -10,6 +12,40 @@ import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import Input from '@mui/material/Input';
+import { IconButton } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
+import CloseIcon from '@mui/icons-material/Close';
+import './Chat.css'
+
+const StyledBadge = styled(Badge)(({ theme }) => ({
+  '& .MuiBadge-badge': {
+    backgroundColor: '#44b700',
+    color: '#44b700',
+    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+    '&::after': {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      borderRadius: '50%',
+      animation: 'ripple 1.2s infinite ease-in-out',
+      border: '1px solid currentColor',
+      content: '""',
+    },
+  },
+  '@keyframes ripple': {
+    '0%': {
+      transform: 'scale(.8)',
+      opacity: 1,
+    },
+    '100%': {
+      transform: 'scale(2.4)',
+      opacity: 0,
+    },
+  },
+}));
 
 const Chat = ({ activeChat }) => {
   const [messages, setMessages] = useState([]);
@@ -96,7 +132,21 @@ const Chat = ({ activeChat }) => {
 
   return (
     <Box className="chat-container">
-      <Typography variant="h4" className="chat-header">Chat: {receiverName}</Typography>
+      
+      <Typography variant="h6" className="chat-header">
+        <div>
+        <StyledBadge
+          overlap="circular"
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          variant="dot"
+        >
+          <Avatar alt={receiverName} src={avatarReceiver} sx={{ width: 56, height: 56 }}/>  
+        </StyledBadge> 
+      {receiverName}</div>
+      <IconButton className='close-icon' color="background: #00000099;" onClick={handleSendMessage}>
+          <CloseIcon className='i-close' />
+      </IconButton>
+      </Typography>
       <List className="message-list">
         {messages.map((message, index) => (
           <ListItem key={index} className={`message ${message.sender_id === senderId ? 'message--sent' : 'message--received'}`}>
@@ -113,13 +163,16 @@ const Chat = ({ activeChat }) => {
         ))}
       </List>
       <Box className="message-input">
-        <TextField
+        <Input
+          placeholder="Digite sua mensagem" 
+          variant="soft"
           value={inputValue}
           onChange={(event) => setInputValue(event.target.value)}
+          endDecorator={IconButton}
         />
-        <Button variant="contained" color="primary" onClick={handleSendMessage}>
-          Enviar
-        </Button>
+        <IconButton className='send-icon' color="background: #00000099;" onClick={handleSendMessage}>
+          <SendIcon className='icon-s' />
+        </IconButton>
       </Box>
     </Box>
   );

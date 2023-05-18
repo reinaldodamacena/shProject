@@ -11,6 +11,7 @@ import Avatar from '@mui/material/Avatar';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { styled } from '@mui/material/styles';
 import Badge from '@mui/material/Badge';
+import './FriendList.css'
 
 
 
@@ -88,7 +89,7 @@ const FriendList = ({ setActiveChat }) => {
     const token = localStorage.getItem('authToken'); // Recupere o token aqui
     const receiver_first_name = connection.user.first_name;
     const avatarSender = profileData.avatar;
-    const avatarReceiver = connection.user.avatar;
+    const avatarReceiver = connection.avatar;
 
 
     console.log('senderId:', senderId);
@@ -128,7 +129,7 @@ const FriendList = ({ setActiveChat }) => {
                   anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                   variant="dot"
                 >
-                  <Avatar alt={connection.user.username} src={''}/>  
+                  <Avatar alt={connection.user.username} src={connection.avatar}/>  
                 </StyledBadge>  
               </ListItemAvatar>
               <ListItemText
