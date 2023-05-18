@@ -178,3 +178,32 @@ export const searchCommunityByName = async (searchQuery) => {
   }
 };
 
+export const getCommunityCreator = async (communityId) => {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const response = await api.get(`${COMMUNITY_ROUTE}${communityId}/creator/`, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw new Error('Erro ao obter o criador da comunidade: ' + error.message);
+  }
+};
+
+export const getCommunityMembers = async (communityId) => {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const response = await api.get(`${COMMUNITY_ROUTE}${communityId}/members/`, {
+      headers: {
+        Authorization: `Token ${authToken}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw new Error('Erro ao obter os membros da comunidade: ' + error.message);
+  }
+};
