@@ -13,17 +13,22 @@ const Chat = ({ activeChat }) => {
   const senderId = activeChat?.senderId || null;
   const receiverId = activeChat?.receiverId || null;
   const token = localStorage.getItem('authToken');
+  const receiverName = activeChat?.receiver_first_name || null;
+  const avatarSender = activeChat.avatar_sender; 
+  const avatarReceiver = activeChat.avatar_receiver ;
+
+  console.log('passando os avataresSender', avatarSender);
+  console.log('passando os avataresReceiver:', avatarReceiver);
 
   const onMessageReceivedRef = useRef();
   onMessageReceivedRef.current = (messageData) => {
     console.log('Received message data:', messageData);
-    
+  
     let message;
-    
+  
     if (typeof messageData === 'string') {
       message = JSON.parse(messageData);
-    } else 
-    if (typeof messageData === 'object') {
+    } else if (typeof messageData === 'object') {
       message = messageData;
     } else {
       console.error('Unexpected type of messageData:', typeof messageData);
@@ -31,13 +36,31 @@ const Chat = ({ activeChat }) => {
     }
   
     console.log('Parsed message:', message);
-    
+  
     if (message.command === 'messages') {
-      setMessages(message.messages);
+      // Adicionar informações do avatar às mensagens recebidas
+      const messagesWithAvatars = message.messages.map(msg => {
+        if(msg.sender_id === senderId) {
+          return {...msg, avatar: avatarSender};
+        } else if(msg.sender_id === receiverId) {
+          return {...msg, avatar: avatarReceiver};
+        } else {
+          return msg;
+        }
+      });
+      setMessages(messagesWithAvatars);
     } else {
-      setMessages((prevMessages) => [...prevMessages, message]);
+      // Adicionar informações do avatar à nova mensagem
+      const newMessage = message;
+      if(newMessage.sender_id === senderId) {
+        newMessage.avatar = avatarSender;
+      } else if(newMessage.sender_id === receiverId) {
+        newMessage.avatar = avatarReceiver;
+      }
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
     }
   };
+  
   
 
   useEffect(() => {    
@@ -50,6 +73,7 @@ const Chat = ({ activeChat }) => {
       if (socketRef.current) {
         socketRef.current.close();
       }
+          
     };
   }, [roomName, senderId, receiverId]);
   
@@ -81,14 +105,18 @@ const Chat = ({ activeChat }) => {
   
   return (
         <div className="chat-container">
-        <h1 className="chat-header">Chat: {roomName}</h1>
+        <h1 className="chat-header">Chat: {receiverName}</h1>
         <div className="message-list">
-          {messages.map((message, index) => (
-            <p key={index}>
-              <strong>{message.sender_first_name}: </strong>
-              {message.content}
-            </p>
-          ))}
+        {messages.map((message, index) => (
+            <div key={index} className={`message ${message.sender_id === senderId ? 'message--sent' : 'message--received'}`}>
+                <img className="message__avatar" src={message.sender_id === senderId ? avatarSender : (message.sender_id === receiverId ? avatarReceiver : null)} alt="User avatar"/>
+                <div className="message__content">
+                    <strong>{message.sender_first_name}: </strong>
+                    {message.content}
+                </div>
+            </div>
+        ))}
+
         </div>
         <div className="message-input">
           <input 

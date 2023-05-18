@@ -86,10 +86,17 @@ const FriendList = ({ setActiveChat }) => {
     const senderId = profileData ? profileData.id : null; // ID do usuário logado
     const receiverId = connection.id; // ID da conexão
     const token = localStorage.getItem('authToken'); // Recupere o token aqui
+    const receiver_first_name = connection.user.first_name;
+    const avatarSender = profileData.avatar;
+    const avatarReceiver = connection.user.avatar;
+
 
     console.log('senderId:', senderId);
     console.log('receiverId:', receiverId);
     console.log('token:',token);
+    console.log('receiverName', receiver_first_name);
+    console.log("avatares", avatarSender);
+    console.log("avaters!", avatarReceiver);
 
     if (senderId && receiverId && token) {
       const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -97,9 +104,10 @@ const FriendList = ({ setActiveChat }) => {
       // let wsURL = `${wsScheme}//${window.location.hostname}:8000${CHAT_ROUTE}${formattedRoomName}/`;
       connectToChat(formattedRoomName, senderId, receiverId, token, onMessageReceived);
     
-      console.log('Connection established:', formattedRoomName);
+      console.log('Connection established:', connection);
     
-      setActiveChat({ name: formattedRoomName, senderId, receiverId });
+      setActiveChat({ name: formattedRoomName, senderId, receiverId, receiver_first_name, avatar_sender: avatarSender, avatar_receiver: avatarReceiver });
+
     }
   };
 
