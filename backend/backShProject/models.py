@@ -20,7 +20,7 @@ class Community(models.Model):
     description = models.CharField(max_length=200)
     members = models.ManyToManyField(User)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_communities', null=True)
-
+    photo = models.ImageField(upload_to='community_photos/', null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -28,9 +28,10 @@ class Community(models.Model):
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
-    file = models.FileField(upload_to='posts/', null=True, blank=True)  # Substitui o campo 'image'
+    file = models.FileField(upload_to='posts/', null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     likes = models.ManyToManyField(User, blank=True, related_name='post_likes')
+    group = models.ForeignKey(Community, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f"{self.author.username} - {self.timestamp.strftime('%d/%m/%Y %H:%M:%S')}"
