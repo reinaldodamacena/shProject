@@ -38,22 +38,27 @@ const Post = ({ user, profile, content, file, timestamp, likes, postId }) => {
     try {
       const authToken = localStorage.getItem('authToken');
       const endpoint = `http://localhost:8000/posts/${postId}/like/`;
-
+  
+      const newLikedState = !liked; // Novo estado do liked
+  
+      // Atualiza o estado do liked imediatamente
+      setLiked(newLikedState);
+  
       const response = await axios.post(endpoint, null, {
         headers: {
           'Authorization': `Token ${authToken}`,
         },
       });
-
+  
       if (response.status === 200) {
+        // Atualize o estado postLikes, se necessário
         const newLike = { id: user.id };
-        if (!liked) {
+        if (newLikedState) {
           setPostLikes([...postLikes, newLike]);
         } else {
           const updatedLikes = postLikes.filter(like => like.id !== user.id);
           setPostLikes(updatedLikes);
         }
-        setLiked(!liked);
       } else {
         console.log('Erro ao adicionar/remover o like');
       }

@@ -34,7 +34,7 @@ class CommunitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Community
-        fields = ('id', 'name', 'description', 'members', 'creator')
+        fields = ('id', 'photo', 'name', 'description', 'members', 'creator')
 
 class LikeSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)

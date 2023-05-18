@@ -214,25 +214,40 @@ class CustomAuthToken(ObtainAuthToken):
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key})
 
-class LikePost(generics.RetrieveAPIView):
+class LikePost(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
 
-    def retrieve(self, request, *args, **kwargs):
-        post = self.get_object()
-        user = request.user
+    def post(self, request, *args, **kwargs):
+        post_id = kwargs['post_id']
+        try:
+            post = Post.objects.get(id=post_id)
+            user = request.user
 
-        if user.is_authenticated:
-            liked = post.likes.filter(id=user.id).exists()
-            return Response({'liked': liked})
-        else:
-            return Response({'detail': 'Authentication credentials were not provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+            if user in post.likes.all():
+                post.likes.remove(user)
+                liked = False
+            else:
+                post.likes.add(user)
+                liked = True
 
-    def get_object(self):
-        post_id = self.kwargs.get('post_id')
-        post = get_object_or_404(Post, id=post_id)
-        return post
+            return self.list(request, *args, **kwargs)
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post not found'}, status=404)
+    
+    def get(self, request, *args, **kwargs):
+        post_id = kwargs['post_id']
+        try:
+            post = Post.objects.get(id=post_id)
+            user = request.user
+
+            if user in post.likes.all():
+                return JsonResponse({'liked': True})
+            else:
+                return JsonResponse({'liked': False})
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post not found'}, status=404)
 
 @csrf_exempt
 def create_user(request):
