@@ -47,6 +47,8 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
+
+
 const Chat = ({ activeChat }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
@@ -102,6 +104,7 @@ const Chat = ({ activeChat }) => {
       ]);
     }
   };
+  
 
   useEffect(() => {
     if (roomName && senderId && receiverId) {
@@ -114,6 +117,19 @@ const Chat = ({ activeChat }) => {
       }
     };
   }, [roomName, senderId, receiverId]);
+
+  const listRef = useRef(null);
+  useEffect(() => {
+    // Função para fazer o scroll para a mensagem mais recente
+    const scrollToBottom = () => {
+      if (listRef.current) {
+        listRef.current.scrollTop = listRef.current.scrollHeight;
+      }
+    };
+
+    // Chama a função ao atualizar as mensagens
+    scrollToBottom();
+  }, [messages]);
 
   const handleSendMessage = () => {
     if (inputValue.trim() !== '') {
@@ -147,9 +163,9 @@ const Chat = ({ activeChat }) => {
           <CloseIcon className='i-close' />
       </IconButton>
       </Typography>
-      <List className="message-list">
+      <List ref={listRef} className="message-list">
         {messages.map((message, index) => (
-          <ListItem key={index} className={`message ${message.sender_id === senderId ? 'message--sent' : 'message--received'}`}>
+          <ListItem key={index} sx={{ width: '80%' }} className={`message ${message.sender_id === senderId ? 'message--sent' : 'message--received'}`}>
             <Avatar className="message__avatar" alt="User avatar" src={message.avatar || undefined} />
             <ListItemText
               primary={
