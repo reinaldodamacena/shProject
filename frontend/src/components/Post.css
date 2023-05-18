@@ -37,3 +37,8 @@
 .b-like, .b-comment, .b-send{
     cursor:pointer;
 }
+.comment{
+    border: 1px solid #787878;
+    padding: 5px;
+    border-radius: 15px;
+}
